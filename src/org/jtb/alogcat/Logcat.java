@@ -16,12 +16,10 @@ import android.widget.TextView;
 public class Logcat {
 	private Level mLevel = null;
 	private String mFilter = null;
-	private int mMax = 100;
 
-	public Logcat(Level level, String filter, int max) {
+	public Logcat(Level level, String filter) {
 		mLevel = level;
 		mFilter = filter;
-		mMax = max;
 	}
 
 	public void cat(Handler handler) {
@@ -45,6 +43,8 @@ public class Logcat {
 				// TODO: this is optional, or togglable
 				m = Message.obtain(handler, CatActivity.ENDSCROLL_WHAT);
 				handler.sendMessage(m);
+				
+				
 			}
 		} catch (IOException e) {
 			Log.e("Logcat", "error reading log", e);
