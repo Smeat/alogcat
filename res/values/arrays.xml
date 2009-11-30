@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="level_entries">
+		<item>Verbose</item>
+		<item>Debug</item>
+		<item>Information</item>
+		<item>Warning</item>
+		<item>Error</item>
+		<item>Fatal</item>
+	</string-array>
+	<string-array name="format_entries">
+		<item>brief</item>
+		<item>process</item>
+		<item>tag</item>
+		<item>thread</item>
+		<item>time</item>
+	</string-array>
+</resources>

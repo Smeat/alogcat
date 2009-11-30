@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="app_name">logcat</string>
+    <string name="app_name">aLogcat</string>
+<string name="level_menu">Level (%s)</string>
+<string name="cancel">Cancel</string>
+<string name="ok">Okay</string>
+<string name="fatal_title">Fatal</string>
+<string name="error_title">Error</string>
+<string name="warn_title">Warning</string>
+<string name="info_title">Information</string>
+<string name="verbose_title">Verbose</string>
+<string name="debug_title"></string>
+<string name="filter_menu">Filter (%s)</string>
+<string name="filter_dialog_title">Log Filter</string>
+<string name="filter_menu_empty">Filter</string>
+<string name="filter_dialog_text">Enter a log filter. Entries are filtered by case-sensitive substring match.</string>
+<string name="clear">Clear</string>
+<string name="brief_title">Brief</string>
+<string name="process_title">Process</string>
+<string name="tag_title">Tag</string>
+<string name="thread_title">Thread</string>
+<string name="raw_title">Raw</string>
+<string name="time_title">Time</string>
+<string name="long_title">Long</string>
+<string name="format_menu">Format (%s)</string>
+<string name="autoscroll_menu">Auto Scroll (%s)</string>
+<string name="reading_logs">Reading logs, please wait.</string>
+<string name="send_menu">Send</string>
 </resources>
