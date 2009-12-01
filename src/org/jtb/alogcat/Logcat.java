@@ -41,7 +41,7 @@ public class Logcat {
 		mRunning = true;
 	
 		try {
-			Message m = Message.obtain(mHandler, CatActivity.CLEAR_WHAT);
+			Message m = Message.obtain(mHandler, LogActivity.CLEAR_WHAT);
 			mHandler.sendMessage(m);
 
 			logcatProc = Runtime.getRuntime().exec(
@@ -95,11 +95,11 @@ public class Logcat {
 
 		Message m;
 		
-		m = Message.obtain(mHandler, CatActivity.CAT_WHAT);
+		m = Message.obtain(mHandler, LogActivity.CAT_WHAT);
 		m.obj = line;
 		mHandler.sendMessage(m);
 		if (mAutoScroll) {
-			m = Message.obtain(mHandler, CatActivity.ENDSCROLL_WHAT);
+			m = Message.obtain(mHandler, LogActivity.ENDSCROLL_WHAT);
 			mHandler.sendMessage(m);
 		}
 	}

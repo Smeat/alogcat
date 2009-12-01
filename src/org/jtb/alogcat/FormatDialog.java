@@ -10,9 +10,9 @@ import android.content.Intent;
 
 public class FormatDialog extends AlertDialog {
 	public static class Builder extends AlertDialog.Builder {
-		private CatActivity mActivity;
+		private LogActivity mActivity;
 		
-		public Builder(CatActivity activity) {
+		public Builder(LogActivity activity) {
 			super(activity);
 
 			this.mActivity = activity;
@@ -25,7 +25,7 @@ public class FormatDialog extends AlertDialog {
 			setNegativeButton(R.string.cancel,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							mActivity.dismissDialog(CatActivity.LEVEL_DIALOG);
+							mActivity.dismissDialog(LogActivity.LEVEL_DIALOG);
 						}
 					});
 		}

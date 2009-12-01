@@ -9,9 +9,9 @@ import android.widget.EditText;
 
 public class FilterDialog extends AlertDialog {
 	public static class Builder extends AlertDialog.Builder {
-		private CatActivity mActivity;
+		private LogActivity mActivity;
 
-		public Builder(CatActivity activity) {
+		public Builder(LogActivity activity) {
 			super(activity);
 
 			this.mActivity = activity;
@@ -27,7 +27,7 @@ public class FilterDialog extends AlertDialog {
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							mActivity.setFilter(filterEdit.getText().toString());
-							mActivity.dismissDialog(CatActivity.FILTER_DIALOG);
+							mActivity.dismissDialog(LogActivity.FILTER_DIALOG);
 						}
 					});
 			setNeutralButton(R.string.clear,
@@ -35,13 +35,13 @@ public class FilterDialog extends AlertDialog {
 						public void onClick(DialogInterface dialog, int which) {
 							mActivity.setFilter(null);
 							filterEdit.setText(null);
-							mActivity.dismissDialog(CatActivity.FILTER_DIALOG);
+							mActivity.dismissDialog(LogActivity.FILTER_DIALOG);
 						}
 					});
 			setNegativeButton(R.string.cancel,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							mActivity.dismissDialog(CatActivity.FILTER_DIALOG);
+							mActivity.dismissDialog(LogActivity.FILTER_DIALOG);
 						}
 					});
 		}

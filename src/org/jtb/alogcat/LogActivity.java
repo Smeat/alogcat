@@ -17,7 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class CatActivity extends Activity {
+public class LogActivity extends Activity {
 	private static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
 			"MMM d, yyyy HH:mm:ss ZZZZ");
 
@@ -120,7 +120,8 @@ public class CatActivity extends Activity {
 
 	private void reset() {
 		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
-
+		mLastLevel = Level.V;
+		
 		new Thread(new Runnable() {
 			public void run() {
 				if (mLogcat != null) {
