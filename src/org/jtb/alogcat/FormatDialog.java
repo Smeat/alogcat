@@ -19,7 +19,7 @@ public class FormatDialog extends AlertDialog {
 
 			setItems(R.array.format_entries, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					mActivity.setFormat(Format.valueOf(mActivity.getResources().getStringArray(R.array.format_entries)[which]));
+					mActivity.setFormat(Format.getByOrder(which));					
 				}
 			});
 			setNegativeButton(R.string.cancel,

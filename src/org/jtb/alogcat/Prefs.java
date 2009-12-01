@@ -97,7 +97,7 @@ public class Prefs {
 	}
 	
 	public Format getFormat() {
-		return Format.valueOf(getString("format", "brief"));
+		return Format.valueOf(getString("format", "BRIEF"));
 	}
 	
 	public void setFormat(Format format) {

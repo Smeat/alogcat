@@ -16,32 +16,36 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class Logcat {
+	private static final String SEPARATOR = System.getProperty("line.separator");
+
 	private Level mLevel = null;
 	private String mFilter = null;
 	private boolean mRunning = false;
 	private BufferedReader mReader = null;
 	private Format mFormat;
 	private boolean mAutoScroll;
-	private StringBuilder mLogText = new StringBuilder();
-
-	public Logcat(Format format, Level level, String filter, boolean autoScroll) {
+	private ArrayList<String> mLogCache = new ArrayList<String>();
+	private boolean mPlay = true;
+	private Handler mHandler;
+	
+	public Logcat(Handler handler, Format format, Level level, String filter, boolean autoScroll) {
+		mHandler = handler;
 		mLevel = level;
 		mFilter = filter;
 		mFormat = format;
 		mAutoScroll = autoScroll;
 	}
 
-	public void cat(Handler handler) {
+	public void start() {
 		Process logcatProc = null;
 		mRunning = true;
-		String separator = System.getProperty("line.separator");
-
+	
 		try {
-			Message m = Message.obtain(handler, CatActivity.CLEAR_WHAT);
-			handler.sendMessage(m);
+			Message m = Message.obtain(mHandler, CatActivity.CLEAR_WHAT);
+			mHandler.sendMessage(m);
 
 			logcatProc = Runtime.getRuntime().exec(
-					new String[] { "logcat", "-v", mFormat.toString(),
+					new String[] { "logcat", "-v", mFormat.getValue(),
 							"*:" + mLevel });
 
 			mReader = new BufferedReader(new InputStreamReader(logcatProc
@@ -52,20 +56,15 @@ public class Logcat {
 				if (!mRunning) {
 					break;
 				}
-				if (mFilter != null && mFilter.length() != 0
-						&& !line.contains(mFilter)) {
+				if (line.length() == 0) {
 					continue;
 				}
-				m = Message.obtain(handler, CatActivity.CAT_WHAT);
-				m.obj = line;
-				handler.sendMessage(m);
-				if (mAutoScroll) {
-					m = Message.obtain(handler, CatActivity.ENDSCROLL_WHAT);
-					handler.sendMessage(m);
+				if (mPlay) {
+					cat(mLogCache);
+					cat(line);
+				} else {
+					mLogCache.add(line);
 				}
-
-				mLogText.append(line);
-				mLogText.append(separator);
 			}
 		} catch (IOException e) {
 			Log.e("Logcat", "error reading log", e);
@@ -81,8 +80,60 @@ public class Logcat {
 		}
 	}
 
-	public String getLogText() {
-		return mLogText.toString();
+	private void cat(ArrayList<String> cache) {
+		for (int i = 0; i < cache.size(); i++) {
+			cat(cache.get(i));
+		}
+		cache.clear();
+	}
+	
+	private void cat(String line) {
+		if (mFilter != null && mFilter.length() != 0
+				&& !line.contains(mFilter)) {
+			return;
+		}
+
+		Message m;
+		
+		m = Message.obtain(mHandler, CatActivity.CAT_WHAT);
+		m.obj = line;
+		mHandler.sendMessage(m);
+		if (mAutoScroll) {
+			m = Message.obtain(mHandler, CatActivity.ENDSCROLL_WHAT);
+			mHandler.sendMessage(m);
+		}
+	}
+	
+	public String dumpLogText() {
+		Process logcatProc = null;
+		BufferedReader reader = null;
+		
+		try {
+			logcatProc = Runtime.getRuntime().exec(
+					new String[] { "logcat", "-d", "-v", mFormat.getValue(),
+							"*:" + mLevel });
+
+			reader = new BufferedReader(new InputStreamReader(logcatProc
+					.getInputStream()));
+
+			String line;
+			StringBuilder sb = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+				sb.append(SEPARATOR);
+			}
+			return sb.toString();
+		} catch (IOException e) {
+			Log.e("Logcat", "error reading log", e);
+			return null;
+		} finally {
+			if (reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					Log.e("Logcat", "error closing stream", e);
+				}
+		}
 	}
 
 	public void stop() {
@@ -98,5 +149,13 @@ public class Logcat {
 
 	public boolean isRunning() {
 		return mRunning;
+	}
+	
+	public boolean isPlay() {
+		return mPlay;
+	}
+	
+	public void setPlay(boolean play) {
+		mPlay = play;
 	}
 }

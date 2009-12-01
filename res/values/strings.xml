@@ -27,4 +27,6 @@
 <string name="autoscroll_menu">Auto Scroll (%s)</string>
 <string name="reading_logs">Reading logs, please wait.</string>
 <string name="send_menu">Send</string>
+<string name="play_menu">Play</string>
+<string name="pause_menu">Pause</string>
 </resources>

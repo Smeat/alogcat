@@ -19,7 +19,7 @@ public class LevelDialog extends AlertDialog {
 
 			setItems(R.array.level_entries, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					mActivity.setLevel(Level.getByValue(which));
+					mActivity.setLevel(Level.getByOrder(which));
 				}
 			});
 			setNegativeButton(R.string.cancel,

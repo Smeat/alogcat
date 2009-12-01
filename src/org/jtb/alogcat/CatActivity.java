@@ -30,6 +30,7 @@ public class CatActivity extends Activity {
 	private static final int MENU_FORMAT = 2;
 	private static final int MENU_AUTOSCROLL = 3;
 	private static final int MENU_SEND = 4;
+	private static final int MENU_PLAY = 5;
 
 	private static final int WINDOW_SIZE = 1000;
 
@@ -44,15 +45,17 @@ public class CatActivity extends Activity {
 	private LinearLayout mCatLayout;
 	private ScrollView mCatScroll;
 	private Menu mMenu;
+	private MenuItem mPlayItem;
 	private MenuItem mLevelItem;
 	private MenuItem mFilterItem;
 	private MenuItem mFormatItem;
 	private MenuItem mAutoScrollItem;
 
 	private Level mLevel = Level.V;
+	private Level mLastLevel = Level.V;
 	private String mFilter = null;
-	private Logcat mLogCat;
-	private Format mFormat = Format.brief;
+	private Logcat mLogcat;
+	private Format mFormat = Format.BRIEF;
 	private Prefs mPrefs;
 	private boolean mAutoScroll = true;
 
@@ -83,10 +86,15 @@ public class CatActivity extends Activity {
 			mCatLayout.removeViewAt(0);
 		}
 
-		Entry e = new Entry(s);
 		TextView entryText = new TextView(this);
-		entryText.setText(e.getText());
-		entryText.setTextColor(e.getLevel().getColor());
+		entryText.setText(s);
+		Level level = mFormat.getLevel(s);
+		if (level == null) {
+			level = mLastLevel;
+		} else {
+			mLastLevel = level;
+		}
+		entryText.setTextColor(level.getColor());
 		entryText.setTextSize(10);
 		mCatLayout.addView(entryText);
 
@@ -115,15 +123,16 @@ public class CatActivity extends Activity {
 
 		new Thread(new Runnable() {
 			public void run() {
-				if (mLogCat != null) {
-					mLogCat.stop();
+				if (mLogcat != null) {
+					mLogcat.stop();
 				}
 			}
 		}).start();
 		new Thread(new Runnable() {
 			public void run() {
-				mLogCat = new Logcat(mFormat, mLevel, mFilter, mAutoScroll);
-				mLogCat.cat(mHandler);
+				mLogcat = new Logcat(mHandler, mFormat, mLevel, mFilter,
+						mAutoScroll);
+				mLogcat.start();
 			}
 		}).start();
 	}
@@ -132,6 +141,9 @@ public class CatActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		mMenu = menu;
+
+		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
+		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
 
 		mFormatItem = menu.add(0, MENU_FORMAT, 0, getResources().getString(
 				R.string.format_menu, mFormat.getTitle(this)));
@@ -157,6 +169,14 @@ public class CatActivity extends Activity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		if (mLogcat.isPlay()) {
+			mPlayItem.setTitle(R.string.pause_menu);
+			mPlayItem.setIcon(android.R.drawable.ic_media_pause);
+		} else {
+			mPlayItem.setTitle(R.string.play_menu);
+			mPlayItem.setIcon(android.R.drawable.ic_media_play);
+		}
+
 		mFormatItem.setTitle(getResources().getString(R.string.format_menu,
 				mFormat.getTitle(this)));
 
@@ -193,47 +213,51 @@ public class CatActivity extends Activity {
 		case MENU_SEND:
 			send();
 			return true;
+		case MENU_PLAY:
+			mLogcat.setPlay(!mLogcat.isPlay());
+			return true;
 		}
 
 		return false;
 	}
 
 	public void send() {
-		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-		emailIntent.setType("plain/text");
-		// emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, "");
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-				"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
-		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, mLogCat
-				.getLogText());
-		startActivity(Intent.createChooser(emailIntent, "Send log ..."));
+		new Thread(new Runnable() {
+			public void run() {
+				Intent emailIntent = new Intent(
+						android.content.Intent.ACTION_SEND);
+				emailIntent.setType("plain/text");
+				// emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, "");
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, mLogcat
+						.dumpLogText());
+				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
+			}
+		}).start();
 	}
 
 	public void setAutoScroll(boolean autoScroll) {
 		mAutoScroll = autoScroll;
 		mPrefs.setAutoScroll(autoScroll);
-
 		reset();
 	}
 
 	public void setLevel(Level level) {
 		mLevel = level;
 		mPrefs.setLevel(level);
-
 		reset();
 	}
 
 	public void setFilter(String filter) {
 		mFilter = filter;
 		mPrefs.setFilter(filter);
-
 		reset();
 	}
 
 	public void setFormat(Format format) {
 		mFormat = format;
 		mPrefs.setFormat(format);
-
 		reset();
 	}
 
