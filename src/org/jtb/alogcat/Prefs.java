@@ -113,6 +113,22 @@ public class Prefs {
 	public void setFormat(Format format) {
 		setString("format", format.toString());
 	}
+
+	public Buffer getBuffer() {
+		return Buffer.valueOf(getString("buffer", "MAIN"));
+	}
+
+	public void setBuffer(Buffer buffer) {
+		setString("buffer", buffer.toString());
+	}
+
+	public Textsize getTextsize() {
+		return Textsize.valueOf(getString("textsize", "MEDIUM"));
+	}
+
+	public void setTextsize(Textsize textsize) {
+		setString("textsize", textsize.toString());
+	}
 	
 	public String getFilter() {
 		return getString("filter", null);

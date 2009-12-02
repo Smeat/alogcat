@@ -24,13 +24,17 @@ public class LogActivity extends Activity {
 	static final int LEVEL_DIALOG = 0;
 	static final int FILTER_DIALOG = 1;
 	static final int FORMAT_DIALOG = 2;
+	static final int BUFFER_DIALOG = 3;
+	static final int TEXTSIZE_DIALOG = 4;
 
 	private static final int MENU_LEVEL = 0;
 	private static final int MENU_FILTER = 1;
 	private static final int MENU_FORMAT = 2;
-	private static final int MENU_AUTOSCROLL = 3;
-	private static final int MENU_SEND = 4;
-	private static final int MENU_PLAY = 5;
+	private static final int MENU_BUFFER = 3;
+	private static final int MENU_AUTOSCROLL = 4;
+	private static final int MENU_SEND = 5;
+	private static final int MENU_PLAY = 6;
+	private static final int MENU_TEXTSIZE = 7;
 
 	private static final int WINDOW_SIZE = 1000;
 
@@ -41,6 +45,8 @@ public class LogActivity extends Activity {
 	private AlertDialog mLevelDialog;
 	private AlertDialog mFilterDialog;
 	private AlertDialog mFormatDialog;
+	private AlertDialog mBufferDialog;
+	private AlertDialog mTextsizeDialog;
 
 	private LinearLayout mCatLayout;
 	private ScrollView mCatScroll;
@@ -49,6 +55,8 @@ public class LogActivity extends Activity {
 	private MenuItem mLevelItem;
 	private MenuItem mFilterItem;
 	private MenuItem mFormatItem;
+	private MenuItem mBufferItem;
+	private MenuItem mTextsizeItem;
 	private MenuItem mAutoScrollItem;
 
 	private Level mLevel = Level.V;
@@ -58,7 +66,9 @@ public class LogActivity extends Activity {
 	private Format mFormat = Format.BRIEF;
 	private Prefs mPrefs;
 	private boolean mAutoScroll = true;
-
+	private Buffer mBuffer = Buffer.MAIN;
+	private Textsize mTextsize = Textsize.MEDIUM;
+	
 	private Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -95,7 +105,7 @@ public class LogActivity extends Activity {
 			mLastLevel = level;
 		}
 		entryText.setTextColor(level.getColor());
-		entryText.setTextSize(10);
+		entryText.setTextSize(mTextsize.getValue());
 		mCatLayout.addView(entryText);
 
 	}
@@ -114,7 +124,9 @@ public class LogActivity extends Activity {
 		mLevel = mPrefs.getLevel();
 		mFilter = mPrefs.getFilter();
 		mAutoScroll = mPrefs.isAutoScroll();
-
+		mBuffer = mPrefs.getBuffer();
+		mTextsize = mPrefs.getTextsize();
+		
 		reset();
 	}
 
@@ -131,7 +143,7 @@ public class LogActivity extends Activity {
 		}).start();
 		new Thread(new Runnable() {
 			public void run() {
-				mLogcat = new Logcat(mHandler, mFormat, mLevel, mFilter,
+				mLogcat = new Logcat(mHandler, mFormat, mLevel, mBuffer, mFilter,
 						mAutoScroll);
 				mLogcat.start();
 			}
@@ -146,10 +158,6 @@ public class LogActivity extends Activity {
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
 
-		mFormatItem = menu.add(0, MENU_FORMAT, 0, getResources().getString(
-				R.string.format_menu, mFormat.getTitle(this)));
-		mFormatItem.setIcon(android.R.drawable.ic_menu_sort_by_size);
-
 		mLevelItem = menu.add(0, MENU_LEVEL, 0, getResources().getString(
 				R.string.level_menu, mLevel.getTitle(this)));
 		mLevelItem.setIcon(android.R.drawable.ic_menu_agenda);
@@ -158,12 +166,24 @@ public class LogActivity extends Activity {
 				R.string.filter_menu, mFilter));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
 
-		mAutoScrollItem = menu.add(0, MENU_AUTOSCROLL, 0, getResources()
-				.getString(R.string.autoscroll_menu, mAutoScroll));
-		mAutoScrollItem.setIcon(android.R.drawable.ic_menu_more);
-
 		MenuItem sendItem = menu.add(0, MENU_SEND, 0, R.string.send_menu);
 		sendItem.setIcon(android.R.drawable.ic_menu_send);
+
+		mAutoScrollItem = menu.add(0, MENU_AUTOSCROLL, 0, getResources()
+				.getString(R.string.autoscroll_menu, mAutoScroll));
+		mAutoScrollItem.setIcon(android.R.drawable.ic_menu_rotate);
+
+		mFormatItem = menu.add(0, MENU_FORMAT, 0, getResources().getString(
+				R.string.format_menu, mFormat.getTitle(this)));
+		mFormatItem.setIcon(android.R.drawable.ic_menu_sort_by_size);
+
+		mBufferItem = menu.add(0, MENU_BUFFER, 0, getResources().getString(
+				R.string.buffer_menu, mBuffer.getTitle(this)));
+		mBufferItem.setIcon(android.R.drawable.ic_menu_view);
+
+		mTextsizeItem = menu.add(0, MENU_TEXTSIZE, 0, getResources().getString(
+				R.string.textsize_menu, mTextsize.getTitle(this)));
+		mTextsizeItem.setIcon(android.R.drawable.ic_menu_zoom);
 
 		return true;
 	}
@@ -178,9 +198,6 @@ public class LogActivity extends Activity {
 			mPlayItem.setIcon(android.R.drawable.ic_media_play);
 		}
 
-		mFormatItem.setTitle(getResources().getString(R.string.format_menu,
-				mFormat.getTitle(this)));
-
 		mLevelItem.setTitle(getResources().getString(R.string.level_menu,
 				mLevel.getTitle(this)));
 
@@ -192,6 +209,15 @@ public class LogActivity extends Activity {
 
 		mAutoScrollItem.setTitle(getResources().getString(
 				R.string.autoscroll_menu, mAutoScroll));
+
+		mFormatItem.setTitle(getResources().getString(R.string.format_menu,
+				mFormat.getTitle(this)));
+
+		mBufferItem.setTitle(getResources().getString(R.string.buffer_menu,
+				mBuffer.getTitle(this)));
+
+		mTextsizeItem.setTitle(getResources().getString(R.string.textsize_menu,
+				mTextsize.getTitle(this)));
 
 		return true;
 	}
@@ -207,6 +233,12 @@ public class LogActivity extends Activity {
 			return true;
 		case MENU_FORMAT:
 			showDialog(FORMAT_DIALOG);
+			return true;
+		case MENU_BUFFER:
+			showDialog(BUFFER_DIALOG);
+			return true;
+		case MENU_TEXTSIZE:
+			showDialog(TEXTSIZE_DIALOG);
 			return true;
 		case MENU_AUTOSCROLL:
 			setAutoScroll(!mAutoScroll);
@@ -262,6 +294,22 @@ public class LogActivity extends Activity {
 		reset();
 	}
 
+	public void setBuffer(Buffer buffer) {
+		mBuffer = buffer;
+		mPrefs.setBuffer(buffer);
+		reset();
+	}
+
+	public void setTextsize(Textsize textsize) {
+		mTextsize = textsize;
+		mPrefs.setTextsize(textsize);
+		
+		for (int i = 0; i < mCatLayout.getChildCount(); i++) {
+			TextView tv = (TextView) mCatLayout.getChildAt(i);
+			tv.setTextSize(mTextsize.getValue());
+		}
+	}
+
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder;
 
@@ -278,6 +326,14 @@ public class LogActivity extends Activity {
 			builder = new FormatDialog.Builder(this);
 			mFormatDialog = builder.create();
 			return mFormatDialog;
+		case BUFFER_DIALOG:
+			builder = new BufferDialog.Builder(this);
+			mBufferDialog = builder.create();
+			return mBufferDialog;
+		case TEXTSIZE_DIALOG:
+			builder = new TextsizeDialog.Builder(this);
+			mTextsizeDialog = builder.create();
+			return mTextsizeDialog;
 		}
 		return null;
 	}

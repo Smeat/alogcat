@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string-array name="level_entries">
-		<item>Verbose</item>
+		<item>Verbose (default)</item>
 		<item>Debug</item>
 		<item>Information</item>
 		<item>Warning</item>
@@ -9,12 +9,22 @@
 		<item>Fatal</item>
 	</string-array>
 	<string-array name="format_entries">
-		<item>Brief</item>
+		<item>Brief (default)</item>
 		<item>Process</item>
 		<item>Tag</item>
 		<item>Thread</item>
 		<item>Time</item>
 		<item>Long</item>
 		<item>Raw</item>
+	</string-array>
+	<string-array name="buffer_entries">
+		<item>Main (default)</item>
+		<item>Events</item>
+		<item>Radio</item>
+	</string-array>
+	<string-array name="textsize_entries">
+		<item>Small</item>
+		<item>Medium (default)</item>
+		<item>Large</item>
 	</string-array>
 </resources>

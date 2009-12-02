@@ -16,7 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class Logcat {
-	private static final String SEPARATOR = System.getProperty("line.separator");
+	private static final String SEPARATOR = System
+			.getProperty("line.separator");
 
 	private Level mLevel = null;
 	private String mFilter = null;
@@ -27,26 +28,29 @@ public class Logcat {
 	private ArrayList<String> mLogCache = new ArrayList<String>();
 	private boolean mPlay = true;
 	private Handler mHandler;
-	
-	public Logcat(Handler handler, Format format, Level level, String filter, boolean autoScroll) {
+	private Buffer mBuffer;
+
+	public Logcat(Handler handler, Format format, Level level, Buffer buffer,
+			String filter, boolean autoScroll) {
 		mHandler = handler;
 		mLevel = level;
 		mFilter = filter;
 		mFormat = format;
+		mBuffer = buffer;
 		mAutoScroll = autoScroll;
 	}
 
 	public void start() {
 		Process logcatProc = null;
 		mRunning = true;
-	
+
 		try {
 			Message m = Message.obtain(mHandler, LogActivity.CLEAR_WHAT);
 			mHandler.sendMessage(m);
 
 			logcatProc = Runtime.getRuntime().exec(
-					new String[] { "logcat", "-v", mFormat.getValue(),
-							"*:" + mLevel });
+					new String[] { "logcat", "-v", mFormat.getValue(), "-b",
+							mBuffer.getValue(), "*:" + mLevel });
 
 			mReader = new BufferedReader(new InputStreamReader(logcatProc
 					.getInputStream()), 1024);
@@ -86,15 +90,14 @@ public class Logcat {
 		}
 		cache.clear();
 	}
-	
+
 	private void cat(String line) {
-		if (mFilter != null && mFilter.length() != 0
-				&& !line.contains(mFilter)) {
+		if (mFilter != null && mFilter.length() != 0 && !line.contains(mFilter)) {
 			return;
 		}
 
 		Message m;
-		
+
 		m = Message.obtain(mHandler, LogActivity.CAT_WHAT);
 		m.obj = line;
 		mHandler.sendMessage(m);
@@ -103,11 +106,11 @@ public class Logcat {
 			mHandler.sendMessage(m);
 		}
 	}
-	
+
 	public String dumpLogText() {
 		Process logcatProc = null;
 		BufferedReader reader = null;
-		
+
 		try {
 			logcatProc = Runtime.getRuntime().exec(
 					new String[] { "logcat", "-d", "-v", mFormat.getValue(),
@@ -150,11 +153,11 @@ public class Logcat {
 	public boolean isRunning() {
 		return mRunning;
 	}
-	
+
 	public boolean isPlay() {
 		return mPlay;
 	}
-	
+
 	public void setPlay(boolean play) {
 		mPlay = play;
 	}

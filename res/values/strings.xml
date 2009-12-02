@@ -29,4 +29,12 @@
 <string name="send_menu">Send</string>
 <string name="play_menu">Play</string>
 <string name="pause_menu">Pause</string>
+<string name="main_title">Main</string>
+<string name="events_title">Events</string>
+<string name="radio_title">Radio</string>
+<string name="buffer_menu">Buffer (%s)</string>
+<string name="small_title">Small</string>
+<string name="medium_title">Medium (default)</string>
+<string name="large_title">Large</string>
+<string name="textsize_menu">Text Size (%s)</string>
 </resources>

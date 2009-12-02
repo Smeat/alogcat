@@ -4,11 +4,11 @@ import android.content.Context;
 import android.graphics.Color;
 
 public enum Level {
-	V(0, Color.parseColor("#CCCCCC"), R.string.verbose_title), D(1, Color
-			.parseColor("#0066ff"), R.string.debug_title), I(2, Color
-			.parseColor("#00ff00"), R.string.info_title), W(3, Color
-			.parseColor("#ffcc00"), R.string.warn_title), E(4, Color
-			.parseColor("#ff3300"), R.string.error_title), F(5, Color
+	V(0, Color.parseColor("#121212"), R.string.verbose_title), D(1, Color
+			.parseColor("#00006C"), R.string.debug_title), I(2, Color
+			.parseColor("#20831B"), R.string.info_title), W(3, Color
+			.parseColor("#FD7916"), R.string.warn_title), E(4, Color
+			.parseColor("#FD0010"), R.string.error_title), F(5, Color
 			.parseColor("#ff0066"), R.string.fatal_title);
 
 	private static Level[] byOrder = new Level[6];
