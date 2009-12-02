@@ -97,7 +97,17 @@ public class Prefs {
 	}
 	
 	public Format getFormat() {
-		return Format.valueOf(getString("format", "BRIEF"));
+		String f =  getString("format", "BRIEF");
+		
+		// UPGRADE
+		// can remove at some point
+	
+		if (!f.equals(f.toUpperCase())) {
+			f = f.toUpperCase();
+			setString("format", f);
+		}
+		
+		return Format.valueOf(f);
 	}
 	
 	public void setFormat(Format format) {
