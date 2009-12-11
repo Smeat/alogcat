@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class LogActivity extends Activity {
 	private static final int MENU_SEND = 5;
 	private static final int MENU_PLAY = 6;
 	private static final int MENU_TEXTSIZE = 7;
+	private static final int MENU_CLEAR = 8;
 
 	private static final int WINDOW_SIZE = 1000;
 
@@ -68,7 +70,7 @@ public class LogActivity extends Activity {
 	private boolean mAutoScroll = true;
 	private Buffer mBuffer = Buffer.MAIN;
 	private Textsize mTextsize = Textsize.MEDIUM;
-	
+
 	private Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -126,14 +128,14 @@ public class LogActivity extends Activity {
 		mAutoScroll = mPrefs.isAutoScroll();
 		mBuffer = mPrefs.getBuffer();
 		mTextsize = mPrefs.getTextsize();
-		
+
 		reset();
 	}
 
 	private void reset() {
 		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
 		mLastLevel = Level.V;
-		
+
 		new Thread(new Runnable() {
 			public void run() {
 				if (mLogcat != null) {
@@ -143,8 +145,8 @@ public class LogActivity extends Activity {
 		}).start();
 		new Thread(new Runnable() {
 			public void run() {
-				mLogcat = new Logcat(mHandler, mFormat, mLevel, mBuffer, mFilter,
-						mAutoScroll);
+				mLogcat = new Logcat(mHandler, mFormat, mLevel, mBuffer,
+						mFilter, mAutoScroll);
 				mLogcat.start();
 			}
 		}).start();
@@ -165,6 +167,9 @@ public class LogActivity extends Activity {
 		mFilterItem = menu.add(0, MENU_FILTER, 0, getResources().getString(
 				R.string.filter_menu, mFilter));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
+
+		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
+		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 
 		MenuItem sendItem = menu.add(0, MENU_SEND, 0, R.string.send_menu);
 		sendItem.setIcon(android.R.drawable.ic_menu_send);
@@ -249,6 +254,10 @@ public class LogActivity extends Activity {
 		case MENU_PLAY:
 			mLogcat.setPlay(!mLogcat.isPlay());
 			return true;
+		case MENU_CLEAR:
+			mLogcat.clear();
+			reset();
+			return true;
 		}
 
 		return false;
@@ -263,11 +272,21 @@ public class LogActivity extends Activity {
 				// emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, "");
 				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
-				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, mLogcat
-						.dumpLogText());
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, dump());
 				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
 			}
 		}).start();
+	}
+
+	private String dump() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < mCatLayout.getChildCount(); i++) {
+			TextView tv = (TextView) mCatLayout.getChildAt(i);
+			CharSequence s = tv.getText();
+			sb.append(s);
+		}
+
+		return sb.toString();
 	}
 
 	public void setAutoScroll(boolean autoScroll) {
@@ -303,7 +322,7 @@ public class LogActivity extends Activity {
 	public void setTextsize(Textsize textsize) {
 		mTextsize = textsize;
 		mPrefs.setTextsize(textsize);
-		
+
 		for (int i = 0; i < mCatLayout.getChildCount(); i++) {
 			TextView tv = (TextView) mCatLayout.getChildAt(i);
 			tv.setTextSize(mTextsize.getValue());

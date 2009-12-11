@@ -71,14 +71,14 @@ public class Logcat {
 				}
 			}
 		} catch (IOException e) {
-			Log.e("Logcat", "error reading log", e);
+			Log.e("alogcat", "error reading log", e);
 			return;
 		} finally {
 			if (mReader != null)
 				try {
 					mReader.close();
 				} catch (IOException e) {
-					Log.e("Logcat", "error closing stream", e);
+					Log.e("alogcat", "error closing stream", e);
 				}
 
 		}
@@ -107,7 +107,7 @@ public class Logcat {
 		}
 	}
 
-	public String dumpLogText() {
+	public String dump() {
 		Process logcatProc = null;
 		BufferedReader reader = null;
 
@@ -127,15 +127,26 @@ public class Logcat {
 			}
 			return sb.toString();
 		} catch (IOException e) {
-			Log.e("Logcat", "error reading log", e);
+			Log.e("alogcat", "error reading log", e);
 			return null;
 		} finally {
 			if (reader != null)
 				try {
 					reader.close();
 				} catch (IOException e) {
-					Log.e("Logcat", "error closing stream", e);
+					Log.e("alogcat", "error closing stream", e);
 				}
+		}
+	}
+
+	public void clear() {
+		Process logcatProc = null;
+
+		try {
+			logcatProc = Runtime.getRuntime().exec(
+					new String[] { "logcat", "-c" });
+		} catch (IOException e) {
+			Log.e("alogcat", "error clearing log", e);
 		}
 	}
 
@@ -146,7 +157,7 @@ public class Logcat {
 				mReader.close();
 			}
 		} catch (IOException e) {
-			Log.e("Logcat", "error closing stream", e);
+			Log.e("alogcat", "error closing stream", e);
 		}
 	}
 

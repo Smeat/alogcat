@@ -37,4 +37,5 @@
 <string name="medium_title">Medium (default)</string>
 <string name="large_title">Large</string>
 <string name="textsize_menu">Text Size (%s)</string>
+<string name="clear_menu">Clear Log</string>
 </resources>
