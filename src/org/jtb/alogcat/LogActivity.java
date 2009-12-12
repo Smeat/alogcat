@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -108,6 +109,7 @@ public class LogActivity extends Activity {
 		}
 		entryText.setTextColor(level.getColor());
 		entryText.setTextSize(mTextsize.getValue());
+		entryText.setTypeface(Typeface.DEFAULT_BOLD);
 		mCatLayout.addView(entryText);
 
 	}
