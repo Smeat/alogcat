@@ -25,7 +25,7 @@ public class FormatDialog extends AlertDialog {
 			setNegativeButton(R.string.cancel,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							mActivity.dismissDialog(LogActivity.LEVEL_DIALOG);
+							mActivity.dismissDialog(LogActivity.FORMAT_DIALOG);
 						}
 					});
 		}
