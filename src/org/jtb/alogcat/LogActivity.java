@@ -286,6 +286,7 @@ public class LogActivity extends Activity {
 			TextView tv = (TextView) mCatLayout.getChildAt(i);
 			CharSequence s = tv.getText();
 			sb.append(s);
+			sb.append("\n");
 		}
 
 		return sb.toString();
