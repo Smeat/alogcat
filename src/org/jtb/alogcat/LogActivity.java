@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -134,6 +135,19 @@ public class LogActivity extends Activity {
 		reset();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		reset();
+		Log.d("alogcat", "resumed");
+	}
+	
+	@Override public void onPause() {
+		super.onPause();
+		mLogcat.stop();
+		Log.d("alogcat", "paused");
+	}
+	
 	private void reset() {
 		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
 		mLastLevel = Level.V;

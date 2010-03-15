@@ -29,6 +29,7 @@ public class Logcat {
 	private boolean mPlay = true;
 	private Handler mHandler;
 	private Buffer mBuffer;
+	private Process logcatProc;
 
 	public Logcat(Handler handler, Format format, Level level, Buffer buffer,
 			String filter, boolean autoScroll) {
@@ -38,10 +39,10 @@ public class Logcat {
 		mFormat = format;
 		mBuffer = buffer;
 		mAutoScroll = autoScroll;
+
 	}
 
 	public void start() {
-		Process logcatProc = null;
 		mRunning = true;
 
 		try {
@@ -74,13 +75,18 @@ public class Logcat {
 			Log.e("alogcat", "error reading log", e);
 			return;
 		} finally {
-			if (mReader != null)
+			if (mReader != null) {
 				try {
 					mReader.close();
+					mReader = null;
 				} catch (IOException e) {
 					Log.e("alogcat", "error closing stream", e);
 				}
-
+			}
+			if (logcatProc != null) {
+				logcatProc.destroy();
+				logcatProc = null;
+			}
 		}
 	}
 
@@ -108,11 +114,11 @@ public class Logcat {
 	}
 
 	public String dump() {
-		Process logcatProc = null;
+		Process proc = null;
 		BufferedReader reader = null;
 
 		try {
-			logcatProc = Runtime.getRuntime().exec(
+			proc = Runtime.getRuntime().exec(
 					new String[] { "logcat", "-d", "-v", mFormat.getValue(),
 							"*:" + mLevel });
 
@@ -130,35 +136,36 @@ public class Logcat {
 			Log.e("alogcat", "error reading log", e);
 			return null;
 		} finally {
-			if (reader != null)
+			if (reader != null) {
 				try {
 					reader.close();
 				} catch (IOException e) {
 					Log.e("alogcat", "error closing stream", e);
 				}
+			}
+			if (proc != null) {
+				proc.destroy();
+			}
 		}
 	}
 
 	public void clear() {
-		Process logcatProc = null;
-
+		Process proc = null;
+		
 		try {
-			logcatProc = Runtime.getRuntime().exec(
-					new String[] { "logcat", "-c" });
+			proc = Runtime.getRuntime().exec(new String[] { "logcat", "-c" });
 		} catch (IOException e) {
 			Log.e("alogcat", "error clearing log", e);
+		} finally {
+			if (proc != null) {
+				proc.destroy();
+			}
 		}
 	}
 
 	public void stop() {
+		Log.d("alogcat", "stopping ...");		
 		mRunning = false;
-		try {
-			if (mReader != null) {
-				mReader.close();
-			}
-		} catch (IOException e) {
-			Log.e("alogcat", "error closing stream", e);
-		}
 	}
 
 	public boolean isRunning() {
