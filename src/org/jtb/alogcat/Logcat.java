@@ -113,38 +113,6 @@ public class Logcat {
 		}
 	}
 
-	public String dump() {
-		BufferedReader reader = null;
-
-		try {
-			Runtime.getRuntime().exec(
-					new String[] { "logcat", "-d", "-v", mFormat.getValue(),
-							"*:" + mLevel });
-
-			reader = new BufferedReader(new InputStreamReader(logcatProc
-					.getInputStream()));
-
-			String line;
-			StringBuilder sb = new StringBuilder();
-			while ((line = reader.readLine()) != null) {
-				sb.append(line);
-				sb.append(SEPARATOR);
-			}
-			return sb.toString();
-		} catch (IOException e) {
-			Log.e("alogcat", "error reading log", e);
-			return null;
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					Log.e("alogcat", "error closing stream", e);
-				}
-			}
-		}
-	}
-
 	public void clear() {
 		try {
 			Runtime.getRuntime().exec(new String[] { "logcat", "-c" });

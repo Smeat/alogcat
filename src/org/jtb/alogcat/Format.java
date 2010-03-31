@@ -7,12 +7,12 @@ import java.util.regex.Pattern;
 import android.content.Context;
 
 public enum Format {
-	BRIEF("brief", R.string.brief_title, Pattern.compile("^([VDIWEF]+)/")),
-	PROCESS("process", R.string.process_title, Pattern.compile("^([VDIWEF]+)\\(")),
-	TAG("tag", R.string.tag_title, Pattern.compile("^([VDIWEF]+)/")),
-	THREAD("thread", R.string.thread_title, Pattern.compile("^([VDIWEF]+)\\(")),
-	TIME("time", R.string.time_title, Pattern.compile("([VDIWEF]+)/")),
-	LONG("long", R.string.long_title, Pattern.compile("([VDIWEF]+)/")),
+	BRIEF("brief", R.string.brief_title, Pattern.compile("^([VDIWEF])/")),
+	PROCESS("process", R.string.process_title, Pattern.compile("^([VDIWEF])\\(")),
+	TAG("tag", R.string.tag_title, Pattern.compile("^([VDIWEF])/")),
+	THREAD("thread", R.string.thread_title, Pattern.compile("^([VDIWEF])\\(")),
+	TIME("time", R.string.time_title, Pattern.compile(" ([VDIWEF])/")),
+	LONG("long", R.string.long_title, Pattern.compile("([VDIWEF])/")),
 	RAW("raw", R.string.raw_title, null);
 	
 	private static Format[] byOrder = new Format[7];
