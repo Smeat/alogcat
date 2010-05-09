@@ -1,5 +1,9 @@
 package org.jtb.alogcat;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,7 +18,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,7 +25,9 @@ import android.widget.Toast;
 
 public class LogActivity extends Activity {
 	private static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
-			"MMM d, yyyy HH:mm:ss ZZZZ");
+	"MMM d, yyyy HH:mm:ss ZZZZ");
+	private static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
+	"yyyy-MM-dd-HH-mm-ssZ");
 
 	static final int LEVEL_DIALOG = 0;
 	static final int FILTER_DIALOG = 1;
@@ -39,6 +44,7 @@ public class LogActivity extends Activity {
 	private static final int MENU_PLAY = 6;
 	private static final int MENU_TEXTSIZE = 7;
 	private static final int MENU_CLEAR = 8;
+	private static final int MENU_SAVE = 9;
 
 	private static final int WINDOW_SIZE = 1000;
 
@@ -141,13 +147,14 @@ public class LogActivity extends Activity {
 		reset();
 		Log.d("alogcat", "resumed");
 	}
-	
-	@Override public void onPause() {
+
+	@Override
+	public void onPause() {
 		super.onPause();
 		mLogcat.stop();
 		Log.d("alogcat", "paused");
 	}
-	
+
 	private void reset() {
 		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
 		mLastLevel = Level.V;
@@ -189,6 +196,9 @@ public class LogActivity extends Activity {
 
 		MenuItem sendItem = menu.add(0, MENU_SEND, 0, R.string.send_menu);
 		sendItem.setIcon(android.R.drawable.ic_menu_send);
+
+		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
+		sendItem.setIcon(android.R.drawable.ic_menu_save);
 
 		mAutoScrollItem = menu.add(0, MENU_AUTOSCROLL, 0, getResources()
 				.getString(R.string.autoscroll_menu, mAutoScroll));
@@ -267,6 +277,9 @@ public class LogActivity extends Activity {
 		case MENU_SEND:
 			send();
 			return true;
+		case MENU_SAVE:
+			save();
+			return true;
 		case MENU_PLAY:
 			mLogcat.setPlay(!mLogcat.isPlay());
 			return true;
@@ -290,6 +303,42 @@ public class LogActivity extends Activity {
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
 				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, dump());
 				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
+			}
+		}).start();
+	}
+
+	public void save() {
+		final File path = new File("/sdcard/alogcat");
+		final File file = new File(path + "/alogcat."
+				+ LOG_FILE_FORMAT.format(new Date()) + ".txt");
+
+		Toast.makeText(this,
+				getResources().getString(R.string.saving_log, file.toString()),
+				Toast.LENGTH_LONG).show();
+
+		new Thread(new Runnable() {
+			public void run() {
+				String dump = dump();
+
+				if (!path.exists()) {
+					path.mkdir();
+				}
+				
+				BufferedWriter bw = null;
+				try {
+					file.createNewFile();
+					bw = new BufferedWriter(new FileWriter(file));
+					bw.write(dump);
+				} catch (IOException e) {
+					Log.e("alogcat", "error saving log", e);
+				} finally {
+					if (bw != null) {
+						try {
+							bw.close();
+						} catch (IOException e) {
+						}
+					}
+				}
 			}
 		}).start();
 	}
