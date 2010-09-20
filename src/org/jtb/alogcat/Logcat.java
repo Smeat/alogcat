@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import android.os.Handler;
 import android.os.Message;
@@ -20,7 +21,7 @@ public class Logcat {
 			.getProperty("line.separator");
 
 	private Level mLevel = null;
-	private String mFilter = null;
+	private Pattern mFilterPattern = null;
 	private boolean mRunning = false;
 	private BufferedReader mReader = null;
 	private Format mFormat;
@@ -35,7 +36,7 @@ public class Logcat {
 			String filter, boolean autoScroll) {
 		mHandler = handler;
 		mLevel = level;
-		mFilter = filter;
+		mFilterPattern = (filter == null) ? null : Pattern.compile(filter);
 		mFormat = format;
 		mBuffer = buffer;
 		mAutoScroll = autoScroll;
@@ -98,7 +99,7 @@ public class Logcat {
 	}
 
 	private void cat(String line) {
-		if (mFilter != null && mFilter.length() != 0 && !line.contains(mFilter)) {
+		if (mFilterPattern != null && !mFilterPattern.matcher(line).find()) {
 			return;
 		}
 

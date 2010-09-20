@@ -12,6 +12,7 @@ public enum Format {
 	TAG("tag", R.string.tag_title, Pattern.compile("^([VDIWEF])/")),
 	THREAD("thread", R.string.thread_title, Pattern.compile("^([VDIWEF])\\(")),
 	TIME("time", R.string.time_title, Pattern.compile(" ([VDIWEF])/")),
+	THREADTIME("threadtime", R.string.threadtime_title, Pattern.compile(" ([VDIWEF])/")),
 	LONG("long", R.string.long_title, Pattern.compile("([VDIWEF])/")),
 	RAW("raw", R.string.raw_title, null);
 	
@@ -34,6 +35,7 @@ public enum Format {
 		VALUE_MAP.put(PROCESS.mValue, PROCESS); 
 		VALUE_MAP.put(TAG.mValue, TAG); 
 		VALUE_MAP.put(THREAD.mValue, THREAD); 
+		VALUE_MAP.put(THREADTIME.mValue, THREAD); 
 		VALUE_MAP.put(TIME.mValue, TIME); 
 		VALUE_MAP.put(RAW.mValue, RAW); 
 		VALUE_MAP.put(LONG.mValue, LONG); 

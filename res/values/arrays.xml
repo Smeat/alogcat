@@ -8,23 +8,60 @@
 		<item>Error</item>
 		<item>Fatal</item>
 	</string-array>
+	<string-array name="level_values">
+		<item>V</item>
+		<item>D</item>
+		<item>I</item>
+		<item>W</item>
+		<item>E</item>
+		<item>F</item>
+	</string-array>
 	<string-array name="format_entries">
 		<item>Brief (default)</item>
 		<item>Process</item>
 		<item>Tag</item>
 		<item>Thread</item>
+		<item>Thread Time</item>
 		<item>Time</item>
 		<item>Long</item>
 		<item>Raw</item>
+	</string-array>
+	<string-array name="format_values">
+		<item>BRIEF</item>
+		<item>PROCESS</item>
+		<item>TAG</item>
+		<item>THREAD</item>
+		<item>THREADTIME</item>
+		<item>TIME</item>
+		<item>LONG</item>
+		<item>RAW</item>
 	</string-array>
 	<string-array name="buffer_entries">
 		<item>Main (default)</item>
 		<item>Events</item>
 		<item>Radio</item>
 	</string-array>
+	<string-array name="buffer_values">
+		<item>MAIN</item>
+		<item>EVENTS</item>
+		<item>RADIO</item>
+	</string-array>
 	<string-array name="textsize_entries">
 		<item>Small</item>
 		<item>Medium (default)</item>
 		<item>Large</item>
+	</string-array>
+	<string-array name="textsize_values">
+		<item>SMALL</item>
+		<item>MEDIUM</item>
+		<item>LARGE</item>
+	</string-array>
+	<string-array name="backgroundColor_entries">
+		<item>White</item>
+		<item>Black</item>
+	</string-array>
+	<string-array name="backgroundColor_values">
+		<item>#ffffff</item>
+		<item>#000000</item>
 	</string-array>
 </resources>

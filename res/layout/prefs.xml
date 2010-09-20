@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<ListPreference android:title="Level?"
+		android:summary="Log level used to display log entries."
+		android:key="level" android:defaultValue="V"
+		android:entries="@array/level_entries"
+		android:entryValues="@array/level_values" />
+	<ListPreference android:title="Format?"
+		android:summary="Log format to use when displaying log entries."
+		android:key="format" android:defaultValue="BRIEF"
+		android:entries="@array/format_entries"
+		android:entryValues="@array/format_values" />
+	<ListPreference android:title="Buffer?"
+		android:summary="Log buffer to display."
+		android:key="buffer" android:defaultValue="MAIN"
+		android:entries="@array/buffer_entries"
+		android:entryValues="@array/buffer_values" />
+	<ListPreference android:title="Text size?"
+		android:summary="Text size to use when displaying log entries."
+		android:key="textsize" android:defaultValue="MEDIUM"
+		android:entries="@array/textsize_entries"
+		android:entryValues="@array/textsize_values" />
+	<CheckBoxPreference android:title="Auto scroll?"
+		android:summary="Automatically scroll log output?"
+		android:key="autoScroll" android:defaultValue="true"/>		
+	<ListPreference android:title="Background color?"
+		android:summary="Background color to use when displaying log entries."
+		android:key="backgroundColor" android:defaultValue="#ffffff"
+		android:entries="@array/backgroundColor_entries"
+		android:entryValues="@array/backgroundColor_values" />
+</PreferenceScreen>
+

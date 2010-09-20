@@ -3,6 +3,7 @@ package org.jtb.alogcat;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 
 public class Prefs {
@@ -144,5 +145,11 @@ public class Prefs {
 	
 	public void setAutoScroll(boolean autoScroll) {
 		setBoolean("autoScroll", autoScroll);
+	}
+	
+	public int getBackgroundColor() {
+		String c = getString("backgroundColor", "#ffffff");
+		int color = Color.parseColor(c);
+		return color;
 	}
 }
