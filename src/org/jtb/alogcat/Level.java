@@ -4,12 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 
 public enum Level {
-	V(0, Color.parseColor("#121212"), R.string.verbose_title), D(1, Color
-			.parseColor("#00006C"), R.string.debug_title), I(2, Color
-			.parseColor("#20831B"), R.string.info_title), W(3, Color
-			.parseColor("#FD7916"), R.string.warn_title), E(4, Color
-			.parseColor("#FD0010"), R.string.error_title), F(5, Color
-			.parseColor("#ff0066"), R.string.fatal_title);
+	V(0, "#121212", R.string.verbose_title), D(1, "#00006C",
+			R.string.debug_title), I(2, "#20831B", R.string.info_title), W(3,
+			"#FD7916", R.string.warn_title), E(4, "#FD0010",
+			R.string.error_title), F(5, "#ff0066", R.string.fatal_title);
 
 	private static Level[] byOrder = new Level[6];
 
@@ -22,16 +20,22 @@ public enum Level {
 		byOrder[5] = F;
 	}
 
+	private String mHexColor;
 	private int mColor;
 	private int mValue;
 	private int mTitleId;
 
-	private Level(int value, int color, int titleId) {
+	private Level(int value, String hexColor, int titleId) {
 		mValue = value;
-		mColor = color;
+		mHexColor = hexColor;
+		mColor = Color.parseColor(hexColor);
 		mTitleId = titleId;
 	}
 
+	public String getHexColor() {
+		return mHexColor;
+	}
+	
 	public int getColor() {
 		return mColor;
 	}

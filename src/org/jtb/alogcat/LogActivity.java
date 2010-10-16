@@ -16,6 +16,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,9 +28,9 @@ import android.widget.Toast;
 
 public class LogActivity extends Activity {
 	private static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
-	"MMM d, yyyy HH:mm:ss ZZZZ");
+			"MMM d, yyyy HH:mm:ss ZZZZ");
 	private static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
-	"yyyy-MM-dd-HH-mm-ssZ");
+			"yyyy-MM-dd-HH-mm-ssZ");
 
 	static final int FILTER_DIALOG = 1;
 
@@ -128,15 +130,15 @@ public class LogActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		mFormat = mPrefs.getFormat();
-		mTextsize = mPrefs.getTextsize(); 
+		mTextsize = mPrefs.getTextsize();
 		mLevel = mPrefs.getLevel();
 		mBuffer = mPrefs.getBuffer();
 		mAutoScroll = mPrefs.isAutoScroll();
-		
+
 		mCatScroll.setBackgroundColor(mPrefs.getBackgroundColor());
-		
+
 		reset();
 		Log.d("alogcat", "resumed");
 	}
@@ -176,8 +178,8 @@ public class LogActivity extends Activity {
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
 
-		mFilterItem = menu.add(0, MENU_FILTER, 0, getResources().getString(
-				R.string.filter_menu, mFilter));
+		mFilterItem = menu.add(0, MENU_FILTER, 0,
+				getResources().getString(R.string.filter_menu, mFilter));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
 
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
@@ -189,8 +191,8 @@ public class LogActivity extends Activity {
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
 
-		MenuItem prefsItem = menu.add(0, MENU_PREFS, 0, getResources().getString(
-				R.string.prefs_menu));
+		MenuItem prefsItem = menu.add(0, MENU_PREFS, 0, getResources()
+				.getString(R.string.prefs_menu));
 		prefsItem.setIcon(android.R.drawable.ic_menu_preferences);
 
 		return true;
@@ -235,9 +237,8 @@ public class LogActivity extends Activity {
 			reset();
 			return true;
 		case MENU_PREFS:
-			Intent intent = new Intent(this,
-					PrefsActivity.class);
-			startActivity(intent);			
+			Intent intent = new Intent(this, PrefsActivity.class);
+			startActivity(intent);
 			return true;
 		}
 
@@ -249,10 +250,12 @@ public class LogActivity extends Activity {
 			public void run() {
 				Intent emailIntent = new Intent(
 						android.content.Intent.ACTION_SEND);
-				emailIntent.setType("text/plain");
+				//emailIntent.setType(mPrefs.isEmailHtml() ? "text/html" : "text/plain");
+				emailIntent.setType("message/rfc822");
 				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
-				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, dump());
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+						mPrefs.isEmailHtml() ? Html.fromHtml(dumpHtml()) : dump());
 				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
 			}
 		}).start();
@@ -274,7 +277,7 @@ public class LogActivity extends Activity {
 				if (!path.exists()) {
 					path.mkdir();
 				}
-				
+
 				BufferedWriter bw = null;
 				try {
 					file.createNewFile();
@@ -301,6 +304,22 @@ public class LogActivity extends Activity {
 			CharSequence s = tv.getText();
 			sb.append(s);
 			sb.append("\n");
+		}
+
+		return sb.toString();
+	}
+
+	private String dumpHtml() {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < mCatLayout.getChildCount(); i++) {
+			TextView tv = (TextView) mCatLayout.getChildAt(i);
+			String s = (String)tv.getText();
+			Level level = mFormat.getLevel((String) s);
+			
+			sb.append("<font color=\"" + level.getHexColor() + "\" face=\"sans-serif\"><b>");
+			sb.append(TextUtils.htmlEncode(s));
+			sb.append("</b></font><br/>\n");
 		}
 
 		return sb.toString();

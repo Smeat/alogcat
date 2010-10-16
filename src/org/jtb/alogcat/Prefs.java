@@ -152,4 +152,9 @@ public class Prefs {
 		int color = Color.parseColor(c);
 		return color;
 	}
+	
+	public boolean isEmailHtml() {
+		boolean b = getBoolean("emailHtml", false);
+		return b;
+	}
 }
