@@ -7,6 +7,14 @@ import android.graphics.Color;
 import android.preference.PreferenceManager;
 
 public class Prefs {
+	public static final String LEVEL_KEY = "level";
+	public static final String FORMAT_KEY = "format";
+	public static final String BUFFER_KEY = "buffer";
+	public static final String TEXTSIZE_KEY = "textsize";
+	public static final String BACKGROUND_COLOR_KEY = "backgroundColor";
+	public static final String PERIODIC_FREQUENCY_KEY = "periodicFrequency";
+	public static final String PERIODIC_SAVE_KEY = "periodicSave";
+
 	private Context context = null;
 
 	public Prefs(Context context) {
@@ -88,73 +96,90 @@ public class Prefs {
 		}
 		return ia;
 	}
-	
+
 	public Level getLevel() {
-		return Level.valueOf(getString("level", "V"));
+		return Level.valueOf(getString(LEVEL_KEY, "V"));
 	}
 
 	public void setLevel(Level level) {
-		setString("level", level.toString());
+		setString(LEVEL_KEY, level.toString());
 	}
-	
+
 	public Format getFormat() {
-		String f =  getString("format", "BRIEF");
-		
+		String f = getString(FORMAT_KEY, "BRIEF");
+
 		// UPGRADE
 		// can remove at some point
-	
+
 		if (!f.equals(f.toUpperCase())) {
 			f = f.toUpperCase();
-			setString("format", f);
+			setString(FORMAT_KEY, f);
 		}
-		
+
 		return Format.valueOf(f);
 	}
-	
+
 	public void setFormat(Format format) {
-		setString("format", format.toString());
+		setString(FORMAT_KEY, format.toString());
 	}
 
 	public Buffer getBuffer() {
-		return Buffer.valueOf(getString("buffer", "MAIN"));
+		return Buffer.valueOf(getString(BUFFER_KEY, "MAIN"));
 	}
 
 	public void setBuffer(Buffer buffer) {
-		setString("buffer", buffer.toString());
+		setString(BUFFER_KEY, buffer.toString());
 	}
 
 	public Textsize getTextsize() {
-		return Textsize.valueOf(getString("textsize", "MEDIUM"));
+		return Textsize.valueOf(getString(TEXTSIZE_KEY, "MEDIUM"));
 	}
 
 	public void setTextsize(Textsize textsize) {
-		setString("textsize", textsize.toString());
+		setString(TEXTSIZE_KEY, textsize.toString());
 	}
-	
+
 	public String getFilter() {
 		return getString("filter", null);
 	}
-	
+
 	public void setFilter(String filter) {
 		setString("filter", filter);
 	}
-	
+
 	public boolean isAutoScroll() {
 		return getBoolean("autoScroll", true);
 	}
-	
+
 	public void setAutoScroll(boolean autoScroll) {
 		setBoolean("autoScroll", autoScroll);
 	}
-	
-	public int getBackgroundColor() {
-		String c = getString("backgroundColor", "#ffffff");
-		int color = Color.parseColor(c);
-		return color;
+
+	public BackgroundColor getBackgroundColor() {
+		String c = getString(BACKGROUND_COLOR_KEY, "WHITE");
+		BackgroundColor bc;
+
+		try {
+			bc = BackgroundColor.valueOf(c);
+		} catch (IllegalArgumentException iae) {
+			bc = BackgroundColor.valueOfHexColor(c);
+		}
+		return bc;
 	}
-	
+
 	public boolean isEmailHtml() {
 		boolean b = getBoolean("emailHtml", false);
 		return b;
+	}
+	
+	public boolean isPeriodicSave() {
+		boolean b = getBoolean(PERIODIC_SAVE_KEY, false);
+		return b;
+	}
+	
+	public Frequency getPeriodicFrequency() {
+		String s = getString(PERIODIC_FREQUENCY_KEY, "HOUR");
+		Frequency f = Frequency.valueOf(s);
+		return f;
 	}
 }

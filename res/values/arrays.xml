@@ -58,10 +58,23 @@
 	</string-array>
 	<string-array name="backgroundColor_entries">
 		<item>White</item>
+		<item>Gray</item>
 		<item>Black</item>
 	</string-array>
 	<string-array name="backgroundColor_values">
 		<item>#ffffff</item>
+		<item>#e0e0e0</item>
 		<item>#000000</item>
 	</string-array>
+	<string-array name="periodicFrequency_values">
+		<item>FIFTEEN_MINUTES</item>
+		<item>HALF_HOUR</item>
+		<item>HOUR</item>
+	</string-array>
+	<string-array name="periodicFrequency_entries">
+		<item>15 minutes</item>
+		<item>1/2 hour</item>
+		<item>1 hour</item>
+	</string-array>
+	
 </resources>

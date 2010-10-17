@@ -25,8 +25,6 @@
 	<string name="raw_title">Raw</string>
 	<string name="time_title">Time</string>
 	<string name="long_title">Long</string>
-	<string name="format_menu">Format (%s)</string>
-	<string name="autoscroll_menu">Auto Scroll (%s)</string>
 	<string name="reading_logs">Reading logs, please wait.</string>
 	<string name="send_menu">Send</string>
 	<string name="play_menu">Play</string>
@@ -34,14 +32,18 @@
 	<string name="main_title">Main</string>
 	<string name="events_title">Events</string>
 	<string name="radio_title">Radio</string>
-	<string name="buffer_menu">Buffer (%s)</string>
 	<string name="small_title">Small</string>
-	<string name="medium_title">Medium (default)</string>
+	<string name="medium_title">Medium</string>
 	<string name="large_title">Large</string>
-	<string name="textsize_menu">Text Size (%s)</string>
 	<string name="clear_menu">Clear</string>
 	<string name="save_menu">Save</string>
 	<string name="prefs_menu">Preferences</string>
 	<string name="saving_log">Saving log to: %s, please wait</string>
 	<string name="threadtime_title">Thread Time</string>
+	<string name="black_title">Black</string>
+	<string name="white_title">White</string>
+	<string name="gray_title">Gray</string>
+	<string name="freq_15_title">15 minutes</string>
+	<string name="freq_30_title">1/2 hour</string>
+	<string name="freq_60_title">1 hour</string>
 </resources>

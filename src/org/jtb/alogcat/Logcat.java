@@ -3,18 +3,14 @@ package org.jtb.alogcat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Stack;
 import java.util.regex.Pattern;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.text.format.DateFormat;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class Logcat {
 	private static final String SEPARATOR = System
@@ -31,15 +27,21 @@ public class Logcat {
 	private Handler mHandler;
 	private Buffer mBuffer;
 	private Process logcatProc;
-
-	public Logcat(Handler handler, Format format, Level level, Buffer buffer,
-			String filter, boolean autoScroll) {
+	private Prefs mPrefs;
+	private Context mContext;
+	
+	public Logcat(Context context, Handler handler) {
+		mContext = context;
+		mPrefs = new Prefs(mContext);
 		mHandler = handler;
-		mLevel = level;
+		
+		mLevel = mPrefs.getLevel();
+		
+		String filter = mPrefs.getFilter();
 		mFilterPattern = (filter == null) ? null : Pattern.compile(filter);
-		mFormat = format;
-		mBuffer = buffer;
-		mAutoScroll = autoScroll;
+		mFormat = mPrefs.getFormat();
+		mBuffer = mPrefs.getBuffer();
+		mAutoScroll = mPrefs.isAutoScroll();
 
 	}
 

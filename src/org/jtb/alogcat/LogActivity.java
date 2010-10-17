@@ -1,9 +1,6 @@
 package org.jtb.alogcat;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -11,13 +8,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,8 +23,6 @@ import android.widget.Toast;
 public class LogActivity extends Activity {
 	private static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
 			"MMM d, yyyy HH:mm:ss ZZZZ");
-	private static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
-			"yyyy-MM-dd-HH-mm-ssZ");
 
 	static final int FILTER_DIALOG = 1;
 
@@ -51,19 +43,19 @@ public class LogActivity extends Activity {
 
 	private LinearLayout mCatLayout;
 	private ScrollView mCatScroll;
-	private Menu mMenu;
 	private MenuItem mPlayItem;
 	private MenuItem mFilterItem;
 
-	private Level mLevel = Level.V;
 	private Level mLastLevel = Level.V;
 	private String mFilter = null;
 	private Logcat mLogcat;
+	private LogDumper mLogDumper;
 	private Format mFormat = Format.BRIEF;
 	private Prefs mPrefs;
-	private boolean mAutoScroll = true;
-	private Buffer mBuffer = Buffer.MAIN;
 	private Textsize mTextsize = Textsize.MEDIUM;
+	private LogActivity mThis;
+	
+	private SaveScheduler mSaveScheduler;
 
 	private Handler mHandler = new Handler() {
 		@Override
@@ -112,17 +104,21 @@ public class LogActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.log);
 
+		mThis = this;
 		mPrefs = new Prefs(this);
 
 		mCatScroll = (ScrollView) findViewById(R.id.cat_scroll);
 		mCatLayout = (LinearLayout) findViewById(R.id.cat_layout);
 
 		mFormat = mPrefs.getFormat();
-		mLevel = mPrefs.getLevel();
 		mFilter = mPrefs.getFilter();
-		mAutoScroll = mPrefs.isAutoScroll();
-		mBuffer = mPrefs.getBuffer();
 		mTextsize = mPrefs.getTextsize();
+
+		mSaveScheduler = new SaveScheduler(this);
+
+		LogDumper.Type type = mPrefs.isEmailHtml() ? LogDumper.Type.HTML
+				: LogDumper.Type.PLAIN;
+		mLogDumper = new LogDumper(this, type);
 
 		reset();
 	}
@@ -133,14 +129,17 @@ public class LogActivity extends Activity {
 
 		mFormat = mPrefs.getFormat();
 		mTextsize = mPrefs.getTextsize();
-		mLevel = mPrefs.getLevel();
-		mBuffer = mPrefs.getBuffer();
-		mAutoScroll = mPrefs.isAutoScroll();
 
-		mCatScroll.setBackgroundColor(mPrefs.getBackgroundColor());
+		mCatScroll.setBackgroundColor(mPrefs.getBackgroundColor().getColor());
 
 		reset();
 		Log.d("alogcat", "resumed");
+
+		if (mPrefs.isPeriodicSave()) {
+			mSaveScheduler.start();
+		} else {
+			mSaveScheduler.stop();
+		}
 	}
 
 	@Override
@@ -163,8 +162,7 @@ public class LogActivity extends Activity {
 		}).start();
 		new Thread(new Runnable() {
 			public void run() {
-				mLogcat = new Logcat(mHandler, mFormat, mLevel, mBuffer,
-						mFilter, mAutoScroll);
+				mLogcat = new Logcat(mThis, mHandler);
 				mLogcat.start();
 			}
 		}).start();
@@ -173,7 +171,6 @@ public class LogActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		mMenu = menu;
 
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
@@ -227,7 +224,10 @@ public class LogActivity extends Activity {
 			send();
 			return true;
 		case MENU_SAVE:
-			save();
+			File f = new Saver(this).save();
+			String msg = getResources().getString(R.string.saving_log,
+					f.toString());
+			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 			return true;
 		case MENU_PLAY:
 			mLogcat.setPlay(!mLogcat.isPlay());
@@ -250,79 +250,16 @@ public class LogActivity extends Activity {
 			public void run() {
 				Intent emailIntent = new Intent(
 						android.content.Intent.ACTION_SEND);
-				//emailIntent.setType(mPrefs.isEmailHtml() ? "text/html" : "text/plain");
+				// emailIntent.setType(mPrefs.isEmailHtml() ? "text/html" :
+				// "text/plain");
 				emailIntent.setType("message/rfc822");
 				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
 				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-						mPrefs.isEmailHtml() ? Html.fromHtml(dumpHtml()) : dump());
+						mLogDumper.dump());
 				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
 			}
 		}).start();
-	}
-
-	public void save() {
-		final File path = new File("/sdcard/alogcat");
-		final File file = new File(path + "/alogcat."
-				+ LOG_FILE_FORMAT.format(new Date()) + ".txt");
-
-		Toast.makeText(this,
-				getResources().getString(R.string.saving_log, file.toString()),
-				Toast.LENGTH_LONG).show();
-
-		new Thread(new Runnable() {
-			public void run() {
-				String dump = dump();
-
-				if (!path.exists()) {
-					path.mkdir();
-				}
-
-				BufferedWriter bw = null;
-				try {
-					file.createNewFile();
-					bw = new BufferedWriter(new FileWriter(file));
-					bw.write(dump);
-				} catch (IOException e) {
-					Log.e("alogcat", "error saving log", e);
-				} finally {
-					if (bw != null) {
-						try {
-							bw.close();
-						} catch (IOException e) {
-						}
-					}
-				}
-			}
-		}).start();
-	}
-
-	private String dump() {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < mCatLayout.getChildCount(); i++) {
-			TextView tv = (TextView) mCatLayout.getChildAt(i);
-			CharSequence s = tv.getText();
-			sb.append(s);
-			sb.append("\n");
-		}
-
-		return sb.toString();
-	}
-
-	private String dumpHtml() {
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < mCatLayout.getChildCount(); i++) {
-			TextView tv = (TextView) mCatLayout.getChildAt(i);
-			String s = (String)tv.getText();
-			Level level = mFormat.getLevel((String) s);
-			
-			sb.append("<font color=\"" + level.getHexColor() + "\" face=\"sans-serif\"><b>");
-			sb.append(TextUtils.htmlEncode(s));
-			sb.append("</b></font><br/>\n");
-		}
-
-		return sb.toString();
 	}
 
 	public void setFilter(String filter) {

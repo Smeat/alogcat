@@ -32,5 +32,14 @@
 			android:summary="Email logs in HTML format?" android:key="emailHtml"
 			android:defaultValue="false" />
 	</PreferenceCategory>
+	<PreferenceCategory android:title="Periodic Save">
+		<CheckBoxPreference android:title="Periodic Save?"
+			android:summary="Periodically save log to SD card? Use with caution." android:key="periodicSave"
+			android:defaultValue="false" />
+		<ListPreference android:title="Frequency?"
+			android:summary="Frequency to save log to SD card. This WILL affect battery life!"
+			android:key="periodicFrequency" android:defaultValue="HOUR"
+			android:entries="@array/periodicFrequency_entries" android:entryValues="@array/periodicFrequency_values" />
+	</PreferenceCategory>
 </PreferenceScreen>
 
