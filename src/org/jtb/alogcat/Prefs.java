@@ -1,5 +1,7 @@
 package org.jtb.alogcat;
 
+import java.util.regex.Pattern;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -142,7 +144,15 @@ public class Prefs {
 	public String getFilter() {
 		return getString("filter", null);
 	}
-
+	
+	public Pattern getFilterPattern() {
+		String p = getString("filter", null);
+		if (p == null) {
+			return null;
+		}
+		return Pattern.compile(p);
+	}
+	
 	public void setFilter(String filter) {
 		setString("filter", filter);
 	}

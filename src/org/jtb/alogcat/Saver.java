@@ -22,7 +22,7 @@ public class Saver {
 		mContext = context;
 		mPrefs = new Prefs(mContext);
 
-		mLogDumper = new LogDumper(mContext, LogDumper.Type.PLAIN);
+		mLogDumper = new LogDumper(mContext, false);
 	}
 
 	public File save() {

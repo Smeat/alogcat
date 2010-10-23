@@ -27,22 +27,18 @@ public class Logcat {
 	private Handler mHandler;
 	private Buffer mBuffer;
 	private Process logcatProc;
-	private Prefs mPrefs;
 	private Context mContext;
 	
 	public Logcat(Context context, Handler handler) {
 		mContext = context;
-		mPrefs = new Prefs(mContext);
 		mHandler = handler;
-		
-		mLevel = mPrefs.getLevel();
-		
-		String filter = mPrefs.getFilter();
-		mFilterPattern = (filter == null) ? null : Pattern.compile(filter);
-		mFormat = mPrefs.getFormat();
-		mBuffer = mPrefs.getBuffer();
-		mAutoScroll = mPrefs.isAutoScroll();
 
+		Prefs prefs = new Prefs(mContext);
+		mLevel = prefs.getLevel();
+		mFilterPattern = prefs.getFilterPattern();
+		mFormat = prefs.getFormat();
+		mBuffer = prefs.getBuffer();
+		mAutoScroll = prefs.isAutoScroll();
 	}
 
 	public void start() {

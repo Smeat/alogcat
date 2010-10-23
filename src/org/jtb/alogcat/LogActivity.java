@@ -12,6 +12,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,7 +55,7 @@ public class LogActivity extends Activity {
 	private Prefs mPrefs;
 	private Textsize mTextsize = Textsize.MEDIUM;
 	private LogActivity mThis;
-	
+
 	private SaveScheduler mSaveScheduler;
 
 	private Handler mHandler = new Handler() {
@@ -113,12 +114,8 @@ public class LogActivity extends Activity {
 		mFormat = mPrefs.getFormat();
 		mFilter = mPrefs.getFilter();
 		mTextsize = mPrefs.getTextsize();
-
 		mSaveScheduler = new SaveScheduler(this);
-
-		LogDumper.Type type = mPrefs.isEmailHtml() ? LogDumper.Type.HTML
-				: LogDumper.Type.PLAIN;
-		mLogDumper = new LogDumper(this, type);
+		mLogDumper = new LogDumper(this);
 
 		reset();
 	}
@@ -250,13 +247,13 @@ public class LogActivity extends Activity {
 			public void run() {
 				Intent emailIntent = new Intent(
 						android.content.Intent.ACTION_SEND);
-				// emailIntent.setType(mPrefs.isEmailHtml() ? "text/html" :
-				// "text/plain");
+				//emailIntent.setType(mPrefs.isEmailHtml() ? "text/html"
+				//		: "text/plain");
 				emailIntent.setType("message/rfc822");
 				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
 				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-						mLogDumper.dump());
+						Html.fromHtml(mLogDumper.dump()));
 				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
 			}
 		}).start();

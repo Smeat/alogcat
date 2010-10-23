@@ -3,22 +3,24 @@ package org.jtb.alogcat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
 public class LogDumper {
-	public static enum Type {
-		PLAIN, HTML
-	};
-
 	private Prefs mPrefs;
-	private Type mType;
-
-	public LogDumper(Context context, Type type) {
+	private boolean html = false;
+	
+	public LogDumper(Context context) {
 		mPrefs = new Prefs(context);
-		mType = type;
+		html = mPrefs.isEmailHtml();
+	}
+
+	public LogDumper(Context context, boolean html) {
+		mPrefs = new Prefs(context);
+		this.html = html;
 	}
 
 	public String dump() {
@@ -37,22 +39,24 @@ public class LogDumper {
 					1024);
 
 			String line;
+			Pattern filterPattern = mPrefs.getFilterPattern();
+			Format format = mPrefs.getFormat();
+			
 			while ((line = br.readLine()) != null) {
-				if (line.length() == 0) {
+				if (filterPattern != null && !filterPattern.matcher(line).find()) {
 					continue;
 				}
-				switch (mType) {
-				case PLAIN:
+
+				if (!html) {
 					sb.append(line);
 					sb.append('\n');
-					break;
-				case HTML:
-					Level level = mPrefs.getFormat().getLevel(line);
+				} else {
+					Level level = format.getLevel(line);
 					sb.append("<font color=\"" + level.getHexColor()
 							+ "\" face=\"sans-serif\"><b>");
 					sb.append(TextUtils.htmlEncode(line));
 					sb.append("</b></font><br/>\n");
-					break;
+
 				}
 			}
 			return sb.toString();
