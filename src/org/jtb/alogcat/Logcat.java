@@ -17,10 +17,12 @@ public class Logcat {
 			.getProperty("line.separator");
 
 	private Level mLevel = null;
+	private String mFilter = null;
 	private Pattern mFilterPattern = null;
 	private boolean mRunning = false;
 	private BufferedReader mReader = null;
 	private Format mFormat;
+	private boolean mIsFilterPattern;
 	private boolean mAutoScroll;
 	private ArrayList<String> mLogCache = new ArrayList<String>();
 	private boolean mPlay = true;
@@ -28,17 +30,19 @@ public class Logcat {
 	private Buffer mBuffer;
 	private Process logcatProc;
 	private Context mContext;
-	
+
 	public Logcat(Context context, Handler handler) {
 		mContext = context;
 		mHandler = handler;
 
 		Prefs prefs = new Prefs(mContext);
+
 		mLevel = prefs.getLevel();
+		mIsFilterPattern = prefs.isFilterPattern();
+		mFilter = prefs.getFilter();
 		mFilterPattern = prefs.getFilterPattern();
 		mFormat = prefs.getFormat();
 		mBuffer = prefs.getBuffer();
-		mAutoScroll = prefs.isAutoScroll();
 	}
 
 	public void start() {
@@ -52,8 +56,8 @@ public class Logcat {
 					new String[] { "logcat", "-v", mFormat.getValue(), "-b",
 							mBuffer.getValue(), "*:" + mLevel });
 
-			mReader = new BufferedReader(new InputStreamReader(logcatProc
-					.getInputStream()), 1024);
+			mReader = new BufferedReader(new InputStreamReader(
+					logcatProc.getInputStream()), 1024);
 
 			String line;
 			while (mRunning && (line = mReader.readLine()) != null) {
@@ -97,8 +101,14 @@ public class Logcat {
 	}
 
 	private void cat(String line) {
-		if (mFilterPattern != null && !mFilterPattern.matcher(line).find()) {
-			return;
+		if (mIsFilterPattern) {
+			if (mFilterPattern != null && !mFilterPattern.matcher(line).find()) {
+				return;
+			}
+		} else {
+			if (mFilter != null && !line.toLowerCase().contains(mFilter)) {
+				return;
+			}
 		}
 
 		Message m;
@@ -106,10 +116,6 @@ public class Logcat {
 		m = Message.obtain(mHandler, LogActivity.CAT_WHAT);
 		m.obj = line;
 		mHandler.sendMessage(m);
-		if (mAutoScroll) {
-			m = Message.obtain(mHandler, LogActivity.ENDSCROLL_WHAT);
-			mHandler.sendMessage(m);
-		}
 	}
 
 	public void clear() {
@@ -122,7 +128,7 @@ public class Logcat {
 	}
 
 	public void stop() {
-		Log.d("alogcat", "stopping ...");		
+		Log.d("alogcat", "stopping ...");
 		mRunning = false;
 	}
 

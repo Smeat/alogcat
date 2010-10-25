@@ -48,12 +48,9 @@ public class LogActivity extends Activity {
 	private MenuItem mFilterItem;
 
 	private Level mLastLevel = Level.V;
-	private String mFilter = null;
 	private Logcat mLogcat;
 	private LogDumper mLogDumper;
-	private Format mFormat = Format.BRIEF;
 	private Prefs mPrefs;
-	private Textsize mTextsize = Textsize.MEDIUM;
 	private LogActivity mThis;
 
 	private SaveScheduler mSaveScheduler;
@@ -65,13 +62,6 @@ public class LogActivity extends Activity {
 			case CAT_WHAT:
 				String line = (String) msg.obj;
 				cat(line);
-				break;
-			case ENDSCROLL_WHAT:
-				mCatScroll.post(new Runnable() {
-					public void run() {
-						mCatScroll.fullScroll(ScrollView.FOCUS_DOWN);
-					}
-				});
 				break;
 			case CLEAR_WHAT:
 				mCatLayout.removeAllViews();
@@ -87,17 +77,25 @@ public class LogActivity extends Activity {
 
 		TextView entryText = new TextView(this);
 		entryText.setText(s);
-		Level level = mFormat.getLevel(s);
+		Format format = mPrefs.getFormat();
+		Level level = format.getLevel(s);
 		if (level == null) {
 			level = mLastLevel;
 		} else {
 			mLastLevel = level;
 		}
 		entryText.setTextColor(level.getColor());
-		entryText.setTextSize(mTextsize.getValue());
+		entryText.setTextSize(mPrefs.getTextsize().getValue());
 		entryText.setTypeface(Typeface.DEFAULT_BOLD);
 		mCatLayout.addView(entryText);
 
+		if (mPrefs.isAutoScroll()) {
+			mCatScroll.post(new Runnable() {
+				public void run() {
+					mCatScroll.fullScroll(ScrollView.FOCUS_DOWN);
+				}
+			});			
+		}
 	}
 
 	@Override
@@ -111,9 +109,6 @@ public class LogActivity extends Activity {
 		mCatScroll = (ScrollView) findViewById(R.id.cat_scroll);
 		mCatLayout = (LinearLayout) findViewById(R.id.cat_layout);
 
-		mFormat = mPrefs.getFormat();
-		mFilter = mPrefs.getFilter();
-		mTextsize = mPrefs.getTextsize();
 		mSaveScheduler = new SaveScheduler(this);
 		mLogDumper = new LogDumper(this);
 
@@ -123,9 +118,6 @@ public class LogActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		mFormat = mPrefs.getFormat();
-		mTextsize = mPrefs.getTextsize();
 
 		mCatScroll.setBackgroundColor(mPrefs.getBackgroundColor().getColor());
 
@@ -146,7 +138,7 @@ public class LogActivity extends Activity {
 		Log.d("alogcat", "paused");
 	}
 
-	private void reset() {
+	public void reset() {
 		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
 		mLastLevel = Level.V;
 
@@ -173,7 +165,7 @@ public class LogActivity extends Activity {
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
 
 		mFilterItem = menu.add(0, MENU_FILTER, 0,
-				getResources().getString(R.string.filter_menu, mFilter));
+				getResources().getString(R.string.filter_menu, mPrefs.getFilter()));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
 
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
@@ -203,10 +195,11 @@ public class LogActivity extends Activity {
 		}
 
 		int filterMenuId = R.string.filter_menu;
-		if (mFilter == null || mFilter.length() == 0) {
+		String filter = mPrefs.getFilter();
+		if (filter == null || filter.length() == 0) {
 			filterMenuId = R.string.filter_menu_empty;
 		}
-		mFilterItem.setTitle(getResources().getString(filterMenuId, mFilter));
+		mFilterItem.setTitle(getResources().getString(filterMenuId, filter));
 
 		return true;
 	}
@@ -259,19 +252,11 @@ public class LogActivity extends Activity {
 		}).start();
 	}
 
-	public void setFilter(String filter) {
-		mFilter = filter;
-		mPrefs.setFilter(filter);
-		reset();
-	}
-
 	protected Dialog onCreateDialog(int id) {
-		AlertDialog.Builder builder;
 
 		switch (id) {
 		case FILTER_DIALOG:
-			builder = new FilterDialog.Builder(this);
-			mFilterDialog = builder.create();
+			mFilterDialog = new FilterDialog(this);
 			return mFilterDialog;
 		}
 		return null;

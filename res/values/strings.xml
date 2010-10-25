@@ -15,8 +15,10 @@
 	<string name="filter_menu">Filter (%s)</string>
 	<string name="filter_dialog_title">Log Filter</string>
 	<string name="filter_menu_empty">Filter</string>
-	<string name="filter_dialog_text">Enter a log filter. You may enter a Java-conforming
-		regular expression, or a simple substring.</string>
+	<string name="filter_dialog_text">A log filter can be a simple substring or a
+		Java-conforming
+		regular expression.</string>
+	<string name="pattern_error_text">Invalid regular expression</string>
 	<string name="clear">Clear</string>
 	<string name="brief_title">Brief</string>
 	<string name="process_title">Process</string>

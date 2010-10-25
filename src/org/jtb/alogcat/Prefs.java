@@ -1,12 +1,14 @@
 package org.jtb.alogcat;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class Prefs {
 	public static final String LEVEL_KEY = "level";
@@ -146,11 +148,21 @@ public class Prefs {
 	}
 	
 	public Pattern getFilterPattern() {
+		if (!isFilterPattern()) {
+			return null;
+		}
+		
 		String p = getString("filter", null);
 		if (p == null) {
 			return null;
 		}
-		return Pattern.compile(p);
+		try {
+			return Pattern.compile(p, Pattern.CASE_INSENSITIVE);
+		} catch (PatternSyntaxException e) {
+			setString("filter", null);
+			Log.w("alogcat", "invalid filter pattern found, cleared");
+			return null;
+		}
 	}
 	
 	public void setFilter(String filter) {
@@ -191,5 +203,13 @@ public class Prefs {
 		String s = getString(PERIODIC_FREQUENCY_KEY, "HOUR");
 		Frequency f = Frequency.valueOf(s);
 		return f;
+	}
+	
+	public boolean isFilterPattern() {
+		return getBoolean("filterPattern", false);
+	}
+	
+	public void setFilterPattern(boolean filterPattern) {
+		setBoolean("filterPattern", filterPattern);
 	}
 }
