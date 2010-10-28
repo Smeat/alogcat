@@ -22,9 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class LogActivity extends Activity {
-	private static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
-			"MMM d, yyyy HH:mm:ss ZZZZ");
-
 	static final int FILTER_DIALOG = 1;
 
 	private static final int MENU_FILTER = 1;
@@ -50,6 +47,7 @@ public class LogActivity extends Activity {
 	private Level mLastLevel = Level.V;
 	private Logcat mLogcat;
 	private LogDumper mLogDumper;
+	private LogSender mLogSender;
 	private Prefs mPrefs;
 	private LogActivity mThis;
 
@@ -111,6 +109,7 @@ public class LogActivity extends Activity {
 
 		mSaveScheduler = new SaveScheduler(this);
 		mLogDumper = new LogDumper(this);
+		mLogSender = new LogSender(this);
 
 		reset();
 	}
@@ -211,10 +210,10 @@ public class LogActivity extends Activity {
 			showDialog(FILTER_DIALOG);
 			return true;
 		case MENU_SEND:
-			send();
+			mLogSender.send();
 			return true;
 		case MENU_SAVE:
-			File f = new Saver(this).save();
+			File f = new LogSaver(this).save();
 			String msg = getResources().getString(R.string.saving_log,
 					f.toString());
 			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -233,23 +232,6 @@ public class LogActivity extends Activity {
 		}
 
 		return false;
-	}
-
-	public void send() {
-		new Thread(new Runnable() {
-			public void run() {
-				Intent emailIntent = new Intent(
-						android.content.Intent.ACTION_SEND);
-				//emailIntent.setType(mPrefs.isEmailHtml() ? "text/html"
-				//		: "text/plain");
-				emailIntent.setType("message/rfc822");
-				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
-				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-						Html.fromHtml(mLogDumper.dump()));
-				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
-			}
-		}).start();
 	}
 
 	protected Dialog onCreateDialog(int id) {

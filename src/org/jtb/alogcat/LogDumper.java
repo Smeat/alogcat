@@ -11,19 +11,12 @@ import android.util.Log;
 
 public class LogDumper {
 	private Prefs mPrefs;
-	private boolean html = false;
 	
 	public LogDumper(Context context) {
 		mPrefs = new Prefs(context);
-		html = mPrefs.isEmailHtml();
 	}
 
-	public LogDumper(Context context, boolean html) {
-		mPrefs = new Prefs(context);
-		this.html = html;
-	}
-
-	public String dump() {
+	public String dump(boolean html) {
 		StringBuilder sb = new StringBuilder();
 		BufferedReader br = null;
 		Process p = null;
@@ -59,7 +52,8 @@ public class LogDumper {
 
 				}
 			}
-			return sb.toString();
+			String s = sb.toString();
+			return s;
 		} catch (IOException e) {
 			Log.e("alogcat", "error reading log", e);
 			return null;

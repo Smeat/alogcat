@@ -10,7 +10,7 @@ import java.util.Date;
 import android.content.Context;
 import android.util.Log;
 
-public class Saver {
+public class LogSaver {
 	private static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ssZ");
 
@@ -18,11 +18,11 @@ public class Saver {
 	private Prefs mPrefs;
 	private LogDumper mLogDumper;
 
-	public Saver(Context context) {
+	public LogSaver(Context context) {
 		mContext = context;
 		mPrefs = new Prefs(mContext);
 
-		mLogDumper = new LogDumper(mContext, false);
+		mLogDumper = new LogDumper(mContext);
 	}
 
 	public File save() {
@@ -35,7 +35,7 @@ public class Saver {
 
 		new Thread(new Runnable() {
 			public void run() {
-				String dump = mLogDumper.dump();
+				String dump = mLogDumper.dump(false);
 
 				if (!path.exists()) {
 					path.mkdir();

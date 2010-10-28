@@ -16,7 +16,7 @@ public class SaveService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		Log.d("alogcat", "handling intent");
 
-		Saver saver = new Saver(this);
+		LogSaver saver = new LogSaver(this);
 		saver.save();
 
 		Lock.release();
