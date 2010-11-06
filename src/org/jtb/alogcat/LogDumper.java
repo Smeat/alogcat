@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class LogDumper {
 	private Prefs mPrefs;
-	
+
 	public LogDumper(Context context) {
 		mPrefs = new Prefs(context);
 	}
@@ -34,9 +34,12 @@ public class LogDumper {
 			String line;
 			Pattern filterPattern = mPrefs.getFilterPattern();
 			Format format = mPrefs.getFormat();
-			
+
+			Level lastLevel = Level.V;
+
 			while ((line = br.readLine()) != null) {
-				if (filterPattern != null && !filterPattern.matcher(line).find()) {
+				if (filterPattern != null
+						&& !filterPattern.matcher(line).find()) {
 					continue;
 				}
 
@@ -45,6 +48,11 @@ public class LogDumper {
 					sb.append('\n');
 				} else {
 					Level level = format.getLevel(line);
+					if (level == null) {
+						level = lastLevel;
+					} else {
+						lastLevel = level;
+					}
 					sb.append("<font color=\"" + level.getHexColor()
 							+ "\" face=\"sans-serif\"><b>");
 					sb.append(TextUtils.htmlEncode(line));
