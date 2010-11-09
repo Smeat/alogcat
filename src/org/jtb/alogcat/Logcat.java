@@ -23,7 +23,6 @@ public class Logcat {
 	private BufferedReader mReader = null;
 	private Format mFormat;
 	private boolean mIsFilterPattern;
-	private boolean mAutoScroll;
 	private ArrayList<String> mLogCache = new ArrayList<String>();
 	private boolean mPlay = true;
 	private Handler mHandler;

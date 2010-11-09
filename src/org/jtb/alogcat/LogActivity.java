@@ -1,27 +1,22 @@
 package org.jtb.alogcat;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ListActivity;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
-public class LogActivity extends Activity {
+public class LogActivity extends ListActivity {
 	static final int FILTER_DIALOG = 1;
 
 	private static final int MENU_FILTER = 1;
@@ -39,8 +34,8 @@ public class LogActivity extends Activity {
 
 	private AlertDialog mFilterDialog;
 
-	private LinearLayout mCatLayout;
-	private ScrollView mCatScroll;
+	private ListView mLogList;
+	private LogEntryAdapter mLogEntryAdapter;
 	private MenuItem mPlayItem;
 	private MenuItem mFilterItem;
 
@@ -62,19 +57,17 @@ public class LogActivity extends Activity {
 				cat(line);
 				break;
 			case CLEAR_WHAT:
-				mCatLayout.removeAllViews();
+				mLogEntryAdapter.clear();
 				break;
 			}
 		}
 	};
 
 	private void cat(String s) {
-		if (mCatLayout.getChildCount() > WINDOW_SIZE) {
-			mCatLayout.removeViewAt(0);
+		if (mLogEntryAdapter.getCount() > WINDOW_SIZE) {
+			mLogEntryAdapter.remove(0);
 		}
 
-		TextView entryText = new TextView(this);
-		entryText.setText(s);
 		Format format = mPrefs.getFormat();
 		Level level = format.getLevel(s);
 		if (level == null) {
@@ -82,17 +75,16 @@ public class LogActivity extends Activity {
 		} else {
 			mLastLevel = level;
 		}
-		entryText.setTextColor(level.getColor());
-		entryText.setTextSize(mPrefs.getTextsize().getValue());
-		entryText.setTypeface(Typeface.DEFAULT_BOLD);
-		mCatLayout.addView(entryText);
-
+		
+		LogEntry entry = new LogEntry(s, level);
+	
+		mLogEntryAdapter.add(entry);
 		if (mPrefs.isAutoScroll()) {
-			mCatScroll.post(new Runnable() {
+			mLogList.post(new Runnable() {
 				public void run() {
-					mCatScroll.fullScroll(ScrollView.FOCUS_DOWN);
+					mLogList.setSelection(mLogEntryAdapter.getCount()-1);
 				}
-			});			
+			});
 		}
 	}
 
@@ -104,23 +96,23 @@ public class LogActivity extends Activity {
 		mThis = this;
 		mPrefs = new Prefs(this);
 
-		mCatScroll = (ScrollView) findViewById(R.id.cat_scroll);
-		mCatLayout = (LinearLayout) findViewById(R.id.cat_layout);
-
 		mSaveScheduler = new SaveScheduler(this);
 		mLogDumper = new LogDumper(this);
 		mLogSender = new LogSender(this);
 
-		reset();
+		mLogList = (ListView) findViewById(android.R.id.list);
+		mLogEntryAdapter = new LogEntryAdapter(this, R.layout.entry, new ArrayList<LogEntry>());
+		setListAdapter(mLogEntryAdapter);		
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		mCatScroll.setBackgroundColor(mPrefs.getBackgroundColor().getColor());
+		mLogList.setBackgroundColor(mPrefs.getBackgroundColor().getColor());
 
 		reset();
+		
 		Log.d("alogcat", "resumed");
 
 		if (mPrefs.isPeriodicSave()) {
@@ -133,7 +125,9 @@ public class LogActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		mLogcat.stop();
+		if (mLogcat != null) {
+			mLogcat.stop();
+		}
 		Log.d("alogcat", "paused");
 	}
 
@@ -141,13 +135,10 @@ public class LogActivity extends Activity {
 		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
 		mLastLevel = Level.V;
 
-		new Thread(new Runnable() {
-			public void run() {
-				if (mLogcat != null) {
-					mLogcat.stop();
-				}
-			}
-		}).start();
+		if (mLogcat != null) {
+			mLogcat.stop();
+		}
+		
 		new Thread(new Runnable() {
 			public void run() {
 				mLogcat = new Logcat(mThis, mHandler);
@@ -163,8 +154,12 @@ public class LogActivity extends Activity {
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
 
-		mFilterItem = menu.add(0, MENU_FILTER, 0,
-				getResources().getString(R.string.filter_menu, mPrefs.getFilter()));
+		mFilterItem = menu.add(
+				0,
+				MENU_FILTER,
+				0,
+				getResources().getString(R.string.filter_menu,
+						mPrefs.getFilter()));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
 
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);

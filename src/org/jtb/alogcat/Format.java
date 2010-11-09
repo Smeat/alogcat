@@ -12,11 +12,11 @@ public enum Format {
 	TAG("tag", R.string.tag_title, Pattern.compile("^([VDIWEF])/")),
 	THREAD("thread", R.string.thread_title, Pattern.compile("^([VDIWEF])\\(")),
 	TIME("time", R.string.time_title, Pattern.compile(" ([VDIWEF])/")),
-	THREADTIME("threadtime", R.string.threadtime_title, Pattern.compile(" ([VDIWEF])/")),
+	THREADTIME("threadtime", R.string.threadtime_title, Pattern.compile(" ([VDIWEF]) ")),
 	LONG("long", R.string.long_title, Pattern.compile("([VDIWEF])/")),
 	RAW("raw", R.string.raw_title, null);
 	
-	private static Format[] byOrder = new Format[7];
+	private static Format[] byOrder = new Format[8];
 
 	static {
 		byOrder[0] = BRIEF;
@@ -24,8 +24,9 @@ public enum Format {
 		byOrder[2] = TAG;
 		byOrder[3] = THREAD;
 		byOrder[4] = TIME;
-		byOrder[5] = LONG;
-		byOrder[6] = RAW;
+		byOrder[5] = THREADTIME;
+		byOrder[6] = LONG;
+		byOrder[7] = RAW;
 	}
 	
 	private static final HashMap<String,Format> VALUE_MAP = new HashMap<String,Format>();

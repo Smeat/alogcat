@@ -1,5 +1,7 @@
 package org.jtb.alogcat;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -18,87 +20,36 @@ public class Prefs {
 	public static final String BACKGROUND_COLOR_KEY = "backgroundColor";
 	public static final String PERIODIC_FREQUENCY_KEY = "periodicFrequency";
 	public static final String PERIODIC_SAVE_KEY = "periodicSave";
+	public static final String FILTER_PATTERN_KEY = "filterPattern";
+	public static final String EMAIL_HTML_KEY = "emailHtml";
 
-	private Context context = null;
-
+	private SharedPreferences sharedPrefs = null;
+	
 	public Prefs(Context context) {
-		this.context = context;
+		sharedPrefs = PreferenceManager
+		.getDefaultSharedPreferences(context);
 	}
 
 	private String getString(String key, String def) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		String s = prefs.getString(key, def);
+		String s = sharedPrefs.getString(key, def);
 		return s;
 	}
 
-	private int getInt(String key, int def) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		int i = Integer.parseInt(prefs.getString(key, Integer.toString(def)));
-		return i;
-	}
-
-	private float getFloat(String key, float def) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		float f = Float.parseFloat(prefs.getString(key, Float.toString(def)));
-		return f;
-	}
-
-	private long getLong(String key, long def) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		long l = Long.parseLong(prefs.getString(key, Long.toString(def)));
-		return l;
-	}
-
 	private void setString(String key, String val) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		Editor e = prefs.edit();
+		Editor e = sharedPrefs.edit();
 		e.putString(key, val);
 		e.commit();
 	}
 
-	private void setBoolean(String key, boolean val) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		Editor e = prefs.edit();
-		e.putBoolean(key, val);
-		e.commit();
-	}
-
-	private void setInt(String key, int val) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		Editor e = prefs.edit();
-		e.putString(key, Integer.toString(val));
-		e.commit();
-	}
-
-	private void setLong(String key, long val) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		Editor e = prefs.edit();
-		e.putString(key, Long.toString(val));
-		e.commit();
-	}
-
 	private boolean getBoolean(String key, boolean def) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		boolean b = prefs.getBoolean(key, def);
+		boolean b = sharedPrefs.getBoolean(key, def);
 		return b;
 	}
 
-	private int[] getIntArray(String key, String def) {
-		String s = getString(key, def);
-		int[] ia = new int[s.length()];
-		for (int i = 0; i < s.length(); i++) {
-			ia[i] = s.charAt(i) - '0';
-		}
-		return ia;
+	private void setBoolean(String key, boolean val) {
+		Editor e = sharedPrefs.edit();
+		e.putBoolean(key, val);
+		e.commit();
 	}
 
 	public Level getLevel() {
@@ -146,12 +97,12 @@ public class Prefs {
 	public String getFilter() {
 		return getString("filter", null);
 	}
-	
+
 	public Pattern getFilterPattern() {
 		if (!isFilterPattern()) {
 			return null;
 		}
-		
+
 		String p = getString("filter", null);
 		if (p == null) {
 			return null;
@@ -164,7 +115,7 @@ public class Prefs {
 			return null;
 		}
 	}
-	
+
 	public void setFilter(String filter) {
 		setString("filter", filter);
 	}
@@ -190,26 +141,26 @@ public class Prefs {
 	}
 
 	public boolean isEmailHtml() {
-		boolean b = getBoolean("emailHtml", false);
+		boolean b = getBoolean(EMAIL_HTML_KEY, false);
 		return b;
 	}
-	
+
 	public boolean isPeriodicSave() {
 		boolean b = getBoolean(PERIODIC_SAVE_KEY, false);
 		return b;
 	}
-	
+
 	public Frequency getPeriodicFrequency() {
 		String s = getString(PERIODIC_FREQUENCY_KEY, "HOUR");
 		Frequency f = Frequency.valueOf(s);
 		return f;
 	}
-	
+
 	public boolean isFilterPattern() {
-		return getBoolean("filterPattern", false);
+		return getBoolean(FILTER_PATTERN_KEY, false);
 	}
-	
+
 	public void setFilterPattern(boolean filterPattern) {
-		setBoolean("filterPattern", filterPattern);
+		setBoolean(FILTER_PATTERN_KEY, filterPattern);
 	}
 }

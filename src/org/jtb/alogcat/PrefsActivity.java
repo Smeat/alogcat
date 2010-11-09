@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 public class PrefsActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
-	private PrefsActivity mThis;
 	private ListPreference mLevelPreference;
 	private ListPreference mFormatPreference;
 	private ListPreference mBufferPreference;
@@ -25,7 +24,7 @@ public class PrefsActivity extends PreferenceActivity implements
 	
 	private Prefs mPrefs;
 	
-	private SaveScheduler mSaveScheduler = new SaveScheduler(this);
+	private SaveScheduler mSaveScheduler;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -33,8 +32,8 @@ public class PrefsActivity extends PreferenceActivity implements
 		addPreferencesFromResource(R.layout.prefs);
 
 		mPrefs = new Prefs(this);
-
-		mThis = this;
+		mSaveScheduler = new SaveScheduler(this);
+		
 		mLevelPreference = (ListPreference) getPreferenceScreen()
 		.findPreference(Prefs.LEVEL_KEY);
 		mFormatPreference = (ListPreference) getPreferenceScreen()
