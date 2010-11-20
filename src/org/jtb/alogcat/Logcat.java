@@ -13,9 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 public class Logcat {
-	private static final String SEPARATOR = System
-			.getProperty("line.separator");
-
 	private Level mLevel = null;
 	private String mFilter = null;
 	private Pattern mFilterPattern = null;
@@ -23,12 +20,12 @@ public class Logcat {
 	private BufferedReader mReader = null;
 	private Format mFormat;
 	private boolean mIsFilterPattern;
-	private ArrayList<String> mLogCache = new ArrayList<String>();
-	private boolean mPlay = true;
 	private Handler mHandler;
 	private Buffer mBuffer;
 	private Process logcatProc;
 	private Context mContext;
+	private ArrayList<String> mLogCache = new ArrayList<String>();
+	private boolean mPlay = true;
 
 	public Logcat(Context context, Handler handler) {
 		mContext = context;
@@ -45,6 +42,7 @@ public class Logcat {
 	}
 
 	public void start() {
+		Log.d("alogcat", "starting ...");
 		mRunning = true;
 
 		try {
@@ -77,6 +75,8 @@ public class Logcat {
 			Log.e("alogcat", "error reading log", e);
 			return;
 		} finally {
+			Log.d("alogcat", "stopped");
+			
 			if (logcatProc != null) {
 				logcatProc.destroy();
 				logcatProc = null;
@@ -92,20 +92,13 @@ public class Logcat {
 		}
 	}
 
-	private void cat(ArrayList<String> cache) {
-		for (int i = 0; i < cache.size(); i++) {
-			cat(cache.get(i));
-		}
-		cache.clear();
-	}
-
 	private void cat(String line) {
 		if (mIsFilterPattern) {
 			if (mFilterPattern != null && !mFilterPattern.matcher(line).find()) {
 				return;
 			}
 		} else {
-			if (mFilter != null && !line.toLowerCase().contains(mFilter)) {
+			if (mFilter != null && !line.toLowerCase().contains(mFilter.toLowerCase())) {
 				return;
 			}
 		}
@@ -116,16 +109,14 @@ public class Logcat {
 		m.obj = line;
 		mHandler.sendMessage(m);
 	}
-
-	public void clear() {
-		try {
-			Runtime.getRuntime().exec(new String[] { "logcat", "-c" });
-		} catch (IOException e) {
-			Log.e("alogcat", "error clearing log", e);
-		} finally {
+	
+	private void cat(ArrayList<String> cache) {
+		for (int i = 0; i < cache.size(); i++) {
+			cat(cache.get(i));
 		}
+		cache.clear();
 	}
-
+	
 	public void stop() {
 		Log.d("alogcat", "stopping ...");
 		mRunning = false;
@@ -134,7 +125,7 @@ public class Logcat {
 	public boolean isRunning() {
 		return mRunning;
 	}
-
+	
 	public boolean isPlay() {
 		return mPlay;
 	}
@@ -142,4 +133,5 @@ public class Logcat {
 	public void setPlay(boolean play) {
 		mPlay = play;
 	}
+	
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string-array name="level_entries">
-		<item>Verbose (default)</item>
+		<item>Verbose</item>
 		<item>Debug</item>
 		<item>Information</item>
 		<item>Warning</item>
@@ -17,7 +17,7 @@
 		<item>F</item>
 	</string-array>
 	<string-array name="format_entries">
-		<item>Brief (default)</item>
+		<item>Brief</item>
 		<item>Process</item>
 		<item>Tag</item>
 		<item>Thread</item>
@@ -37,7 +37,7 @@
 		<item>RAW</item>
 	</string-array>
 	<string-array name="buffer_entries">
-		<item>Main (default)</item>
+		<item>Main</item>
 		<item>Events</item>
 		<item>Radio</item>
 	</string-array>

@@ -11,7 +11,7 @@ import android.content.Context;
 import android.util.Log;
 
 public class LogSaver {
-	private static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
+	static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ssZ");
 
 	private Context mContext;

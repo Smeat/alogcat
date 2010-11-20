@@ -54,7 +54,7 @@ public class SaveScheduler {
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		int icon = android.R.drawable.presence_away;
-		CharSequence tickerText = "aLogcat - periodically saving logs";
+		CharSequence tickerText = "aLogcat - saving logs";
 
 		Notification notification = new Notification(icon, tickerText,
 				System.currentTimeMillis());

@@ -52,4 +52,8 @@ public class LogEntryAdapter extends ArrayAdapter<LogEntry> {
     { 
             return false; 
     } 	
+    
+    public List<LogEntry> getLogEntries() {
+    	return entries;
+    }
 }

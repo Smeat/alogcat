@@ -11,7 +11,7 @@
 	<string name="warn_title">Warning</string>
 	<string name="info_title">Information</string>
 	<string name="verbose_title">Verbose</string>
-	<string name="debug_title"></string>
+	<string name="debug_title">Debug</string>
 	<string name="filter_menu">Filter (%s)</string>
 	<string name="filter_dialog_title">Log Filter</string>
 	<string name="filter_menu_empty">Filter</string>
@@ -31,6 +31,8 @@
 	<string name="send_menu">Send</string>
 	<string name="play_menu">Play</string>
 	<string name="pause_menu">Pause</string>
+	<string name="jump_start_menu">Top</string>
+	<string name="jump_end_menu">Bottom</string>
 	<string name="main_title">Main</string>
 	<string name="events_title">Events</string>
 	<string name="radio_title">Radio</string>
