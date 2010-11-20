@@ -365,8 +365,10 @@ public class LogActivity extends ListActivity {
 		StringBuilder sb = new StringBuilder();
 		Level lastLevel = Level.V;
 
-		mLogcat.setPlay(false);
-		for (LogEntry le : mLogEntryAdapter.getLogEntries()) {
+		// make copy to avoid CME
+		List<LogEntry> entries = new ArrayList<LogEntry>(mLogEntryAdapter.getLogEntries());
+
+		for (LogEntry le : entries) {
 			if (!html) {
 				sb.append(le.getText());
 				sb.append('\n');
@@ -377,13 +379,13 @@ public class LogActivity extends ListActivity {
 				} else {
 					lastLevel = level;
 				}
-				sb.append("<font color=\"" + level.getHexColor()
-						+ "\" face=\"sans-serif\"><b>");
+				sb.append("<font color=\"");
+				sb.append(level.getHexColor());
+				sb.append("\" face=\"sans-serif\"><b>");
 				sb.append(TextUtils.htmlEncode(le.getText()));
 				sb.append("</b></font><br/>\n");
 			}
 		}
-		mLogcat.setPlay(true);
 
 		return sb.toString();
 	}
