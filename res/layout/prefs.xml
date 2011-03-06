@@ -24,7 +24,7 @@
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Log Behavior">
 		<CheckBoxPreference android:title="Auto scroll?"
-			android:summary="Automatically scroll log output?" android:key="autoScroll"
+			android:summary="Automatically scroll log output when log is at bottom?" android:key="autoScroll"
 			android:defaultValue="true" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Log Output">

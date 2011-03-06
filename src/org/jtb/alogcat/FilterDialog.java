@@ -3,14 +3,14 @@ package org.jtb.alogcat;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jtb.alogcat.R;
+
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
 

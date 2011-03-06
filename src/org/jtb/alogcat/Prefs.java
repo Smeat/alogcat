@@ -1,16 +1,14 @@
 package org.jtb.alogcat;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import org.jtb.alogcat.R;
 
 public class Prefs {
 	public static final String LEVEL_KEY = "level";

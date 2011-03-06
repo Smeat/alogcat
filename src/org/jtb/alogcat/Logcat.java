@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
 
 public class Logcat {

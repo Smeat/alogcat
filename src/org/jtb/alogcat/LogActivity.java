@@ -19,10 +19,14 @@ import android.os.Message;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
+import org.jtb.alogcat.R;
 
 public class LogActivity extends ListActivity {
 	private static class State {
@@ -42,8 +46,8 @@ public class LogActivity extends ListActivity {
 	private static final int MENU_CLEAR = 8;
 	private static final int MENU_SAVE = 9;
 	private static final int MENU_PREFS = 10;
-	private static final int MENU_JUMP_START = 11;
-	private static final int MENU_JUMP_END = 12;
+	private static final int MENU_JUMP_TOP = 11;
+	private static final int MENU_JUMP_BOTTPM = 12;
 
 	private static final int WINDOW_SIZE = 1000;
 
@@ -70,11 +74,15 @@ public class LogActivity extends ListActivity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case CAT_WHAT:
-				String line = (String) msg.obj;
+				final String line = (String) msg.obj;
 				cat(line);
 				break;
 			case CLEAR_WHAT:
-				mLogEntryAdapter.clear();
+				mLogList.post(new Runnable() {
+					public void run() {
+						mLogEntryAdapter.clear();
+					}
+				});
 				break;
 			}
 		}
@@ -109,16 +117,28 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void jumpStart() {
-		mLogList.setSelection(0);
+		mLogList.post(new Runnable() {
+			public void run() {
+				mLogList.setSelection(0);
+			}
+		});
 	}
 
-	private void jumpEnd() {
-		mLogList.setSelection(mLogEntryAdapter.getLogEntries().size() - 1);
+	private void jumpBottom() {
+		mLogList.post(new Runnable() {
+			public void run() {
+				mLogList.setSelection(mLogEntryAdapter.getCount() - 1);
+			}
+		});
 	}
 
 	private void cat(String s) {
 		if (mLogEntryAdapter.getCount() > WINDOW_SIZE) {
-			mLogEntryAdapter.remove(0);
+			mLogList.post(new Runnable() {
+				public void run() {
+					mLogEntryAdapter.remove(0);
+				}
+			});
 		}
 
 		Format format = mPrefs.getFormat();
@@ -129,16 +149,21 @@ public class LogActivity extends ListActivity {
 			mLastLevel = level;
 		}
 
-		LogEntry entry = new LogEntry(s, level);
+		final LogEntry entry = new LogEntry(s, level);
 
 		mLogEntryAdapter.add(entry);
-		if (mPrefs.isAutoScroll()) {
+		if (mPrefs.isAutoScroll() && isNextLogBottom()) {
 			mLogList.post(new Runnable() {
 				public void run() {
-					mLogList.setSelection(mLogEntryAdapter.getCount() - 1);
+					jumpBottom();
 				}
 			});
 		}
+	}
+
+	private boolean isNextLogBottom() {
+		return mLogList.getLastVisiblePosition() == -1
+				|| mLogList.getLastVisiblePosition() + 1 == mLogList.getCount() - 1;
 	}
 
 	@Override
@@ -152,8 +177,22 @@ public class LogActivity extends ListActivity {
 		mSaveScheduler = new SaveScheduler(this);
 
 		mLogList = (ListView) findViewById(android.R.id.list);
-	
-		Log.v("alogcat", "created");		
+		mLogList.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v,
+					ContextMenuInfo menuInfo) {
+				MenuItem jumpTopItem = menu.add(0, MENU_JUMP_TOP, 0,
+						R.string.jump_start_menu);
+				jumpTopItem.setIcon(android.R.drawable.ic_media_previous);
+
+				MenuItem jumpBottomItem = menu.add(0, MENU_JUMP_BOTTPM, 0,
+						R.string.jump_end_menu);
+				jumpBottomItem.setIcon(android.R.drawable.ic_media_next);
+			}
+		});
+
+		Log.v("alogcat", "created");
 	}
 
 	@Override
@@ -176,7 +215,7 @@ public class LogActivity extends ListActivity {
 		} else {
 			mSaveScheduler.stop();
 		}
-	
+
 		Log.v("alogcat", "started");
 	}
 
@@ -266,14 +305,6 @@ public class LogActivity extends ListActivity {
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
 
-		MenuItem jumpStartItem = menu.add(0, MENU_JUMP_START, 0,
-				R.string.jump_start_menu);
-		jumpStartItem.setIcon(android.R.drawable.ic_media_previous);
-
-		MenuItem jumpEndItem = menu.add(0, MENU_JUMP_END, 0,
-				R.string.jump_end_menu);
-		jumpEndItem.setIcon(android.R.drawable.ic_media_next);
-
 		MenuItem prefsItem = menu.add(0, MENU_PREFS, 0, getResources()
 				.getString(R.string.prefs_menu));
 		prefsItem.setIcon(android.R.drawable.ic_menu_preferences);
@@ -333,23 +364,31 @@ public class LogActivity extends ListActivity {
 			clear();
 			reset();
 			return true;
-		case MENU_JUMP_START:
-			Toast.makeText(this, "Jumping to start of log ...",
-					Toast.LENGTH_SHORT).show();
-			jumpStart();
-			return true;
-		case MENU_JUMP_END:
-			Toast.makeText(this, "Jumping to end of log ...",
-					Toast.LENGTH_SHORT).show();
-			jumpEnd();
-			return true;
 		case MENU_PREFS:
 			Intent intent = new Intent(this, PrefsActivity.class);
 			startActivity(intent);
 			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
+	}
 
-		return false;
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_JUMP_TOP:
+			Toast.makeText(this, "Jumping to top of log ...",
+					Toast.LENGTH_SHORT).show();
+			jumpStart();
+			return true;
+		case MENU_JUMP_BOTTPM:
+			Toast.makeText(this, "Jumping to bottom of log ...",
+					Toast.LENGTH_SHORT).show();
+			jumpBottom();
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
 	}
 
 	private void clear() {
@@ -366,7 +405,8 @@ public class LogActivity extends ListActivity {
 		Level lastLevel = Level.V;
 
 		// make copy to avoid CME
-		List<LogEntry> entries = new ArrayList<LogEntry>(mLogEntryAdapter.getLogEntries());
+		List<LogEntry> entries = new ArrayList<LogEntry>(
+				mLogEntryAdapter.getLogEntries());
 
 		for (LogEntry le : entries) {
 			if (!html) {

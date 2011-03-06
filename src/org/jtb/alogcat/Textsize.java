@@ -1,10 +1,9 @@
 package org.jtb.alogcat;
 
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.content.Context;
+import org.jtb.alogcat.R;
 
 public enum Textsize {
 	SMALL(8, R.string.small_title),

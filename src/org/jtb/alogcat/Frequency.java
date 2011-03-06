@@ -1,5 +1,7 @@
 package org.jtb.alogcat;
 
+import org.jtb.alogcat.R;
+
 import android.app.AlarmManager;
 import android.content.Context;
 

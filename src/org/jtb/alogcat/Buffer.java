@@ -1,8 +1,8 @@
 package org.jtb.alogcat;
 
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.jtb.alogcat.R;
 
 import android.content.Context;
 
