@@ -41,13 +41,13 @@ public class LogActivity extends ListActivity {
 	static final int FILTER_DIALOG = 1;
 
 	private static final int MENU_FILTER = 1;
-	private static final int MENU_SEND = 5;
+	private static final int MENU_SHARE = 5;
 	private static final int MENU_PLAY = 6;
 	private static final int MENU_CLEAR = 8;
 	private static final int MENU_SAVE = 9;
 	private static final int MENU_PREFS = 10;
 	private static final int MENU_JUMP_TOP = 11;
-	private static final int MENU_JUMP_BOTTPM = 12;
+	private static final int MENU_JUMP_BOTTOM = 12;
 
 	private static final int WINDOW_SIZE = 1000;
 
@@ -186,7 +186,7 @@ public class LogActivity extends ListActivity {
 						R.string.jump_start_menu);
 				jumpTopItem.setIcon(android.R.drawable.ic_media_previous);
 
-				MenuItem jumpBottomItem = menu.add(0, MENU_JUMP_BOTTPM, 0,
+				MenuItem jumpBottomItem = menu.add(0, MENU_JUMP_BOTTOM, 0,
 						R.string.jump_end_menu);
 				jumpBottomItem.setIcon(android.R.drawable.ic_media_next);
 			}
@@ -299,8 +299,8 @@ public class LogActivity extends ListActivity {
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
 		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 
-		MenuItem sendItem = menu.add(0, MENU_SEND, 0, R.string.send_menu);
-		sendItem.setIcon(android.R.drawable.ic_menu_send);
+		MenuItem shareItem = menu.add(0, MENU_SHARE, 0, R.string.share_menu);
+		shareItem.setIcon(android.R.drawable.ic_menu_share);
 
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
@@ -338,8 +338,8 @@ public class LogActivity extends ListActivity {
 		case MENU_FILTER:
 			showDialog(FILTER_DIALOG);
 			return true;
-		case MENU_SEND:
-			send();
+		case MENU_SHARE:
+			share();
 			return true;
 		case MENU_SAVE:
 			File f = save();
@@ -381,7 +381,7 @@ public class LogActivity extends ListActivity {
 					Toast.LENGTH_SHORT).show();
 			jumpStart();
 			return true;
-		case MENU_JUMP_BOTTPM:
+		case MENU_JUMP_BOTTOM:
 			Toast.makeText(this, "Jumping to bottom of log ...",
 					Toast.LENGTH_SHORT).show();
 			jumpBottom();
@@ -430,22 +430,27 @@ public class LogActivity extends ListActivity {
 		return sb.toString();
 	}
 
-	private void send() {
+	private void share() {
 		new Thread(new Runnable() {
 			public void run() {
-				boolean html = mPrefs.isEmailHtml();
+				boolean html = mPrefs.isShareHtml();
 				String content = dump(html);
 
-				Intent emailIntent = new Intent(
+				Intent shareIntent = new Intent(
 						android.content.Intent.ACTION_SEND);
-				// emailIntent.setType(mPrefs.isEmailHtml() ? "text/html"
-				// : "text/plain");
-				emailIntent.setType("message/rfc822");
-				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+
+				//emailIntent.setType("message/rfc822");				
+				if (html) {
+					shareIntent.setType("text/html");					
+				} else {
+					shareIntent.setType("text/plain");
+				}
+				
+				shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
-				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+				shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,
 						html ? Html.fromHtml(content) : content);
-				startActivity(Intent.createChooser(emailIntent, "Send log ..."));
+				startActivity(Intent.createChooser(shareIntent, "Share Android Log ..."));
 			}
 		}).start();
 

@@ -28,8 +28,8 @@
 			android:defaultValue="true" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Log Output">
-		<CheckBoxPreference android:title="HTML Email?"
-			android:summary="Email logs in HTML format?" android:key="emailHtml"
+		<CheckBoxPreference android:title="HTML?"
+			android:summary="Share logs in HTML format?" android:key="shareHtml"
 			android:defaultValue="false" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Periodic Save">

@@ -28,7 +28,7 @@
 	<string name="time_title">Time</string>
 	<string name="long_title">Long</string>
 	<string name="reading_logs">Reading logs, please wait.</string>
-	<string name="send_menu">Send</string>
+	<string name="share_menu">Share</string>
 	<string name="play_menu">Play</string>
 	<string name="pause_menu">Pause</string>
 	<string name="jump_start_menu">Top</string>

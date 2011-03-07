@@ -19,7 +19,7 @@ public class Prefs {
 	public static final String PERIODIC_FREQUENCY_KEY = "periodicFrequency";
 	public static final String PERIODIC_SAVE_KEY = "periodicSave";
 	public static final String FILTER_PATTERN_KEY = "filterPattern";
-	public static final String EMAIL_HTML_KEY = "emailHtml";
+	public static final String SHARE_HTML_KEY = "shareHtml";
 
 	private SharedPreferences sharedPrefs = null;
 	
@@ -138,8 +138,8 @@ public class Prefs {
 		return bc;
 	}
 
-	public boolean isEmailHtml() {
-		boolean b = getBoolean(EMAIL_HTML_KEY, false);
+	public boolean isShareHtml() {
+		boolean b = getBoolean(SHARE_HTML_KEY, false);
 		return b;
 	}
 

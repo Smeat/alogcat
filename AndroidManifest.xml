@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.jtb.alogcat" android:versionCode="35" android:versionName="2.2">
+	package="org.jtb.alogcat" android:versionCode="36" android:versionName="2.3">
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:configChanges="keyboardHidden"
 			android:name="org.jtb.alogcat.LogActivity" android:label="@string/app_name">
