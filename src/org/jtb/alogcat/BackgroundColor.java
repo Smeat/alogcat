@@ -3,7 +3,7 @@ package org.jtb.alogcat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 import android.content.Context;
 import android.graphics.Color;

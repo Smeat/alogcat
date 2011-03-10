@@ -2,7 +2,7 @@ package org.jtb.alogcat;
 
 import java.util.HashMap;
 
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 import android.content.Context;
 

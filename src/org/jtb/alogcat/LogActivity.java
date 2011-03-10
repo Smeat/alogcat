@@ -24,9 +24,10 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class LogActivity extends ListActivity {
 	private static class State {
@@ -66,7 +67,9 @@ public class LogActivity extends ListActivity {
 	private Prefs mPrefs;
 	private LogActivity mThis;
 	private boolean mPlay = true;
-
+	private boolean tailing = true;
+	private int scrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
+	
 	private SaveScheduler mSaveScheduler;
 
 	private Handler mHandler = new Handler() {
@@ -78,11 +81,7 @@ public class LogActivity extends ListActivity {
 				cat(line);
 				break;
 			case CLEAR_WHAT:
-				mLogList.post(new Runnable() {
-					public void run() {
-						mLogEntryAdapter.clear();
-					}
-				});
+				mLogEntryAdapter.clear();
 				break;
 			}
 		}
@@ -110,13 +109,16 @@ public class LogActivity extends ListActivity {
 			}
 			mLogList.post(new Runnable() {
 				public void run() {
-					mLogList.setSelection(state.position);
+					synchronized (LogActivity.this) {
+						mLogList.setSelection(state.position);
+					}
 				}
 			});
 		}
 	}
 
-	private void jumpStart() {
+	private void jumpTop() {
+		tailing = false;
 		mLogList.post(new Runnable() {
 			public void run() {
 				mLogList.setSelection(0);
@@ -125,6 +127,7 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void jumpBottom() {
+		tailing = true;
 		mLogList.post(new Runnable() {
 			public void run() {
 				mLogList.setSelection(mLogEntryAdapter.getCount() - 1);
@@ -132,13 +135,9 @@ public class LogActivity extends ListActivity {
 		});
 	}
 
-	private void cat(String s) {
+	private void cat(final String s) {
 		if (mLogEntryAdapter.getCount() > WINDOW_SIZE) {
-			mLogList.post(new Runnable() {
-				public void run() {
-					mLogEntryAdapter.remove(0);
-				}
-			});
+			mLogEntryAdapter.remove(0);
 		}
 
 		Format format = mPrefs.getFormat();
@@ -150,20 +149,11 @@ public class LogActivity extends ListActivity {
 		}
 
 		final LogEntry entry = new LogEntry(s, level);
-
 		mLogEntryAdapter.add(entry);
-		if (mPrefs.isAutoScroll() && isNextLogBottom()) {
-			mLogList.post(new Runnable() {
-				public void run() {
-					jumpBottom();
-				}
-			});
-		}
-	}
 
-	private boolean isNextLogBottom() {
-		return mLogList.getLastVisiblePosition() == -1
-				|| mLogList.getLastVisiblePosition() + 1 == mLogList.getCount() - 1;
+		if (mPrefs.isAutoScroll() && tailing) {
+			jumpBottom();
+		}
 	}
 
 	@Override
@@ -189,6 +179,26 @@ public class LogActivity extends ListActivity {
 				MenuItem jumpBottomItem = menu.add(0, MENU_JUMP_BOTTOM, 0,
 						R.string.jump_end_menu);
 				jumpBottomItem.setIcon(android.R.drawable.ic_media_next);
+			}
+		});
+		mLogList.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				LogActivity.this.scrollState = scrollState;
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+					return;
+				}
+				if (firstVisibleItem + visibleItemCount == totalItemCount) {
+					tailing = true;
+				} else {
+					tailing = false;
+				}
 			}
 		});
 
@@ -379,7 +389,7 @@ public class LogActivity extends ListActivity {
 		case MENU_JUMP_TOP:
 			Toast.makeText(this, "Jumping to top of log ...",
 					Toast.LENGTH_SHORT).show();
-			jumpStart();
+			jumpTop();
 			return true;
 		case MENU_JUMP_BOTTOM:
 			Toast.makeText(this, "Jumping to bottom of log ...",
@@ -439,18 +449,19 @@ public class LogActivity extends ListActivity {
 				Intent shareIntent = new Intent(
 						android.content.Intent.ACTION_SEND);
 
-				//emailIntent.setType("message/rfc822");				
+				// emailIntent.setType("message/rfc822");
 				if (html) {
-					shareIntent.setType("text/html");					
+					shareIntent.setType("text/html");
 				} else {
 					shareIntent.setType("text/plain");
 				}
-				
+
 				shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 						"Android Log: " + LOG_DATE_FORMAT.format(new Date()));
 				shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,
 						html ? Html.fromHtml(content) : content);
-				startActivity(Intent.createChooser(shareIntent, "Share Android Log ..."));
+				startActivity(Intent.createChooser(shareIntent,
+						"Share Android Log ..."));
 			}
 		}).start();
 
