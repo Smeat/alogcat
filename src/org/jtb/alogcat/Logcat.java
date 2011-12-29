@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import android.content.Context;
@@ -48,9 +49,19 @@ public class Logcat {
 			Message m = Message.obtain(mHandler, LogActivity.CLEAR_WHAT);
 			mHandler.sendMessage(m);
 
-			logcatProc = Runtime.getRuntime().exec(
-					new String[] { "logcat", "-v", mFormat.getValue(), "-b",
-							mBuffer.getValue(), "*:" + mLevel });
+			List<String> progs = new ArrayList<String>();
+
+			progs.add("logcat");
+			progs.add("-v");
+			progs.add(mFormat.getValue());
+			if (mBuffer != Buffer.MAIN) {
+				progs.add("-b");
+				progs.add(mBuffer.getValue());
+			}
+			progs.add("*:" + mLevel);
+
+			logcatProc = Runtime.getRuntime()
+					.exec(progs.toArray(new String[0]));
 
 			mReader = new BufferedReader(new InputStreamReader(
 					logcatProc.getInputStream()), 1024);
@@ -75,7 +86,7 @@ public class Logcat {
 			return;
 		} finally {
 			Log.d("alogcat", "stopped");
-			
+
 			if (logcatProc != null) {
 				logcatProc.destroy();
 				logcatProc = null;
@@ -97,7 +108,8 @@ public class Logcat {
 				return;
 			}
 		} else {
-			if (mFilter != null && !line.toLowerCase().contains(mFilter.toLowerCase())) {
+			if (mFilter != null
+					&& !line.toLowerCase().contains(mFilter.toLowerCase())) {
 				return;
 			}
 		}
@@ -108,14 +120,14 @@ public class Logcat {
 		m.obj = line;
 		mHandler.sendMessage(m);
 	}
-	
+
 	private void cat(ArrayList<String> cache) {
 		for (int i = 0; i < cache.size(); i++) {
 			cat(cache.get(i));
 		}
 		cache.clear();
 	}
-	
+
 	public void stop() {
 		Log.d("alogcat", "stopping ...");
 		mRunning = false;
@@ -124,7 +136,7 @@ public class Logcat {
 	public boolean isRunning() {
 		return mRunning;
 	}
-	
+
 	public boolean isPlay() {
 		return mPlay;
 	}
@@ -132,5 +144,5 @@ public class Logcat {
 	public void setPlay(boolean play) {
 		mPlay = play;
 	}
-	
+
 }

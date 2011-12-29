@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
@@ -24,10 +25,11 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public class LogActivity extends ListActivity {
 	private static class State {
@@ -40,6 +42,8 @@ public class LogActivity extends ListActivity {
 			"MMM d, yyyy HH:mm:ss ZZZZ");
 
 	static final int FILTER_DIALOG = 1;
+
+	private static final int PREFS_REQUEST = 1;
 
 	private static final int MENU_FILTER = 1;
 	private static final int MENU_SHARE = 5;
@@ -69,7 +73,7 @@ public class LogActivity extends ListActivity {
 	private boolean mPlay = true;
 	private boolean tailing = true;
 	private int scrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
-	
+
 	private SaveScheduler mSaveScheduler;
 
 	private Handler mHandler = new Handler() {
@@ -201,14 +205,28 @@ public class LogActivity extends ListActivity {
 				}
 			}
 		});
-
+		
 		Log.v("alogcat", "created");
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		Log.i("alogcat", "new intent: " + intent.getAction());
+		setIntent(intent);
+		if (intent.getAction().equals(org.jtb.alogcat.Intent.START_INTENT)) {
+			org.jtb.alogcat.Intent.handleExtras(this, intent);
+		}
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
+		Log.v("alogcat", "started");
+	}
+
+	private void init() {
 		mLogList.setBackgroundColor(mPrefs.getBackgroundColor().getColor());
+		mLogList.setCacheColorHint(mPrefs.getBackgroundColor().getColor());
 
 		final State state = (State) getLastNonConfigurationInstance();
 		if (state != null) {
@@ -226,12 +244,14 @@ public class LogActivity extends ListActivity {
 			mSaveScheduler.stop();
 		}
 
-		Log.v("alogcat", "started");
+		setKeepScreenOn();
 	}
-
+	
 	@Override
 	public void onResume() {
 		super.onResume();
+		onNewIntent(getIntent());
+		init();
 		Log.v("alogcat", "resumed");
 	}
 
@@ -376,11 +396,31 @@ public class LogActivity extends ListActivity {
 			return true;
 		case MENU_PREFS:
 			Intent intent = new Intent(this, PrefsActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, PREFS_REQUEST);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case PREFS_REQUEST:
+			setKeepScreenOn();
+			break;
+		}
+	}
+
+	private void setKeepScreenOn() {
+		if (mPrefs.isKeepScreenOn()) {
+			getWindow()
+					.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		} else {
+			getWindow().clearFlags(
+					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}
+
 	}
 
 	@Override

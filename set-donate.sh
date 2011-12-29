@@ -9,4 +9,4 @@ else
 fi
 
 
-find . -type f -name \*.java -print0 | xargs -0 sed -i "s/$search/$replace/g"
+find src -type f -name \*.java -print0 | xargs -0 sed -i ".tmp" "s!$search!$replace!g"

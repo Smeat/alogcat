@@ -3,7 +3,7 @@ package org.jtb.alogcat;
 import java.util.HashMap;
 
 import android.content.Context;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public enum Textsize {
 	SMALL(8, R.string.small_title),

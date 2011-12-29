@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public class Prefs {
 	public static final String LEVEL_KEY = "level";
@@ -20,12 +20,12 @@ public class Prefs {
 	public static final String PERIODIC_SAVE_KEY = "periodicSave";
 	public static final String FILTER_PATTERN_KEY = "filterPattern";
 	public static final String SHARE_HTML_KEY = "shareHtml";
+	public static final String KEEP_SCREEN_ON_KEY = "keepScreenOn";
 
 	private SharedPreferences sharedPrefs = null;
-	
+
 	public Prefs(Context context) {
-		sharedPrefs = PreferenceManager
-		.getDefaultSharedPreferences(context);
+		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
 	private String getString(String key, String def) {
@@ -143,15 +143,32 @@ public class Prefs {
 		return b;
 	}
 
+	public boolean isKeepScreenOn() {
+		boolean b = getBoolean(KEEP_SCREEN_ON_KEY, false);
+		return b;
+	}
+
+	public void setKeepScreenOn(boolean keep) {
+		setBoolean(KEEP_SCREEN_ON_KEY, keep);
+	}
+
 	public boolean isPeriodicSave() {
 		boolean b = getBoolean(PERIODIC_SAVE_KEY, false);
 		return b;
 	}
 
+	public void setPeriodicSave(boolean save) {
+		setBoolean(PERIODIC_SAVE_KEY, save);
+	}
+	
 	public Frequency getPeriodicFrequency() {
 		String s = getString(PERIODIC_FREQUENCY_KEY, "HOUR");
 		Frequency f = Frequency.valueOf(s);
 		return f;
+	}
+
+	public void setPeriodicFrequency(Frequency f) {
+		setString(PERIODIC_FREQUENCY_KEY, f.toString());
 	}
 
 	public boolean isFilterPattern() {

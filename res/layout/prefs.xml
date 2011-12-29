@@ -1,45 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:title="Log Display">
-		<ListPreference android:title="Level?"
-			android:summary="Log level used to display log entries." android:key="level"
-			android:defaultValue="V" android:entries="@array/level_entries"
-			android:entryValues="@array/level_values" />
-		<ListPreference android:title="Format?"
-			android:summary="Log format to use when displaying log entries."
-			android:key="format" android:defaultValue="BRIEF" android:entries="@array/format_entries"
-			android:entryValues="@array/format_values" />
-		<ListPreference android:title="Buffer?"
-			android:summary="Log buffer to display." android:key="buffer"
-			android:defaultValue="MAIN" android:entries="@array/buffer_entries"
-			android:entryValues="@array/buffer_values" />
-		<ListPreference android:title="Text size?"
-			android:summary="Text size to use when displaying log entries."
-			android:key="textsize" android:defaultValue="MEDIUM" android:entries="@array/textsize_entries"
-			android:entryValues="@array/textsize_values" />
-		<ListPreference android:title="Background color?"
-			android:summary="Background color to use when displaying log entries."
-			android:key="backgroundColor" android:defaultValue="#ffffff"
-			android:entries="@array/backgroundColor_entries" android:entryValues="@array/backgroundColor_values" />
-	</PreferenceCategory>
-	<PreferenceCategory android:title="Log Behavior">
-		<CheckBoxPreference android:title="Auto scroll?"
-			android:summary="Automatically scroll log output when log is at bottom?" android:key="autoScroll"
-			android:defaultValue="true" />
-	</PreferenceCategory>
-	<PreferenceCategory android:title="Log Output">
-		<CheckBoxPreference android:title="HTML?"
-			android:summary="Share logs in HTML format?" android:key="shareHtml"
-			android:defaultValue="false" />
-	</PreferenceCategory>
-	<PreferenceCategory android:title="Periodic Save">
-		<CheckBoxPreference android:title="Periodic Save?"
-			android:summary="Periodically save log to SD card? Use with caution." android:key="periodicSave"
-			android:defaultValue="false" />
-		<ListPreference android:title="Frequency?"
-			android:summary="Frequency to save log to SD card. This WILL affect battery life!"
-			android:key="periodicFrequency" android:defaultValue="HOUR"
-			android:entries="@array/periodicFrequency_entries" android:entryValues="@array/periodicFrequency_values" />
-	</PreferenceCategory>
-</PreferenceScreen>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <PreferenceCategory android:title="Log Display" >
+
+        <ListPreference
+            android:defaultValue="V"
+            android:entries="@array/level_entries"
+            android:entryValues="@array/level_values"
+            android:key="level"
+            android:summary="Log level used to display log entries."
+            android:title="Level?" />
+
+        <ListPreference
+            android:defaultValue="BRIEF"
+            android:entries="@array/format_entries"
+            android:entryValues="@array/format_values"
+            android:key="format"
+            android:summary="Log format to use when displaying log entries."
+            android:title="Format?" />
+
+        <ListPreference
+            android:defaultValue="MAIN"
+            android:entries="@array/buffer_entries"
+            android:entryValues="@array/buffer_values"
+            android:key="buffer"
+            android:summary="Log buffer to display."
+            android:title="Buffer?" />
+
+        <ListPreference
+            android:defaultValue="MEDIUM"
+            android:entries="@array/textsize_entries"
+            android:entryValues="@array/textsize_values"
+            android:key="textsize"
+            android:summary="Text size to use when displaying log entries."
+            android:title="Text size?" />
+
+        <ListPreference
+            android:defaultValue="#ffffff"
+            android:entries="@array/backgroundColor_entries"
+            android:entryValues="@array/backgroundColor_values"
+            android:key="backgroundColor"
+            android:summary="Background color to use when displaying log entries."
+            android:title="Background color?" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="keepScreenOn"
+            android:summary="Prevent screen from turning off when application is running."
+            android:title="Keep Screen On?" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Log Behavior" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="autoScroll"
+            android:summary="Automatically scroll log output when log is at bottom?"
+            android:title="Auto scroll?" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Log Output" >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="shareHtml"
+            android:summary="Share logs in HTML format?"
+            android:title="HTML?" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Periodic Save" >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="periodicSave"
+            android:summary="Periodically save log to SD card? Use with caution."
+            android:title="Periodic Save?" />
+
+        <ListPreference
+            android:defaultValue="HOUR"
+            android:entries="@array/periodicFrequency_entries"
+            android:entryValues="@array/periodicFrequency_values"
+            android:key="periodicFrequency"
+            android:summary="Frequency to save log to SD card. This WILL affect battery life!"
+            android:title="Frequency?" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

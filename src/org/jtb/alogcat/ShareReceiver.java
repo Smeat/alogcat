@@ -5,17 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class SaveReceiver extends BroadcastReceiver {
+public class ShareReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("alogcat", "received intent for save");
+		Log.d("alogcat", "received intent for share");
 
 		org.jtb.alogcat.Intent.handleExtras(context, intent);
 
 		Lock.acquire(context);
 
-		Intent svcIntent = new Intent(context, SaveService.class);
+		Intent svcIntent = new Intent(context, ShareService.class);
 		context.startService(svcIntent);
 	}
+
 }
