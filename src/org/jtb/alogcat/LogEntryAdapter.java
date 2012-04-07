@@ -3,6 +3,7 @@ package org.jtb.alogcat;
 import java.util.List;
 
 import android.app.Activity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,9 @@ public class LogEntryAdapter extends ArrayAdapter<LogEntry> {
 	private Activity mActivity;
 	private List<LogEntry> entries;
 	private Prefs mPrefs;
-	
-	public LogEntryAdapter(Activity activity, int resourceId, List<LogEntry> entries) {
+
+	public LogEntryAdapter(Activity activity, int resourceId,
+			List<LogEntry> entries) {
 		super(activity, resourceId, entries);
 		this.mActivity = activity;
 		this.entries = entries;
@@ -30,31 +32,31 @@ public class LogEntryAdapter extends ArrayAdapter<LogEntry> {
 			LayoutInflater inflater = mActivity.getLayoutInflater();
 			tv = (TextView) inflater.inflate(R.layout.entry, null);
 		} else {
-			tv = (TextView)convertView;
+			tv = (TextView) convertView;
 		}
 
 		tv.setText(entry.getText());
 		tv.setTextColor(entry.getLevel().getColor());
-		tv.setTextSize(mPrefs.getTextsize().getValue());
+		tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mPrefs.getTextsize()
+				.getValue());
 
 		return tv;
 	}
-		
+
 	public void remove(int position) {
 		LogEntry entry = entries.get(position);
 		remove(entry);
 	}
-	
-    public boolean areAllItemsEnabled() 
-    { 
-            return false; 
-    } 
-    public boolean isEnabled(int position) 
-    { 
-            return false; 
-    } 	
-    
-    public List<LogEntry> getLogEntries() {
-    	return entries;
-    }
+
+	public boolean areAllItemsEnabled() {
+		return false;
+	}
+
+	public boolean isEnabled(int position) {
+		return false;
+	}
+
+	public List<LogEntry> getLogEntries() {
+		return entries;
+	}
 }
