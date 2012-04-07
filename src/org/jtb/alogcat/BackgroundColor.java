@@ -3,14 +3,14 @@ package org.jtb.alogcat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 import android.content.Context;
 import android.graphics.Color;
 
 public enum BackgroundColor {
 	BLACK(R.string.black_title, "#000000"), WHITE(R.string.white_title,
-			"#ffffff"), GRAY(R.string.gray_title, "#e0e0e0");
+			"#ffffff"), GRAY(R.string.gray_title, "#bbbbbb");
 
 	private static final Map<String, BackgroundColor> byHexColor;
 
@@ -19,7 +19,7 @@ public enum BackgroundColor {
 			{
 				put("#000000", BLACK);
 				put("#ffffff", WHITE);
-				put("#e0e0e0", GRAY);
+				put("#bbbbbb", GRAY);
 			}
 		};
 	}

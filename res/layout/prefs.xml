@@ -50,15 +50,6 @@
             android:title="Keep Screen On?" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Log Behavior" >
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="autoScroll"
-            android:summary="Automatically scroll log output when log is at bottom?"
-            android:title="Auto scroll?" />
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="Log Output" >
 
         <CheckBoxPreference
@@ -67,22 +58,4 @@
             android:summary="Share logs in HTML format?"
             android:title="HTML?" />
     </PreferenceCategory>
-
-    <PreferenceCategory android:title="Periodic Save" >
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="periodicSave"
-            android:summary="Periodically save log to SD card? Use with caution."
-            android:title="Periodic Save?" />
-
-        <ListPreference
-            android:defaultValue="HOUR"
-            android:entries="@array/periodicFrequency_entries"
-            android:entryValues="@array/periodicFrequency_values"
-            android:key="periodicFrequency"
-            android:summary="Frequency to save log to SD card. This WILL affect battery life!"
-            android:title="Frequency?" />
-    </PreferenceCategory>
-
 </PreferenceScreen>

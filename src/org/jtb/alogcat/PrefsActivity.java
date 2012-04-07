@@ -6,7 +6,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class PrefsActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
@@ -15,19 +15,15 @@ public class PrefsActivity extends PreferenceActivity implements
 	private ListPreference mBufferPreference;
 	private ListPreference mTextsizePreference;
 	private ListPreference mBackgroundColorPreference;
-	private ListPreference mPeriodicFrequencyPreference;
 	
 	private Prefs mPrefs;
-	
-	private SaveScheduler mSaveScheduler;
-	
+		
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.prefs);
 
 		mPrefs = new Prefs(this);
-		mSaveScheduler = new SaveScheduler(this);
 		
 		mLevelPreference = (ListPreference) getPreferenceScreen()
 		.findPreference(Prefs.LEVEL_KEY);
@@ -39,8 +35,6 @@ public class PrefsActivity extends PreferenceActivity implements
 		.findPreference(Prefs.TEXTSIZE_KEY);
 		mBackgroundColorPreference = (ListPreference) getPreferenceScreen()
 		.findPreference(Prefs.BACKGROUND_COLOR_KEY);
-		mPeriodicFrequencyPreference = (ListPreference) getPreferenceScreen()
-		.findPreference(Prefs.PERIODIC_FREQUENCY_KEY);
 		
 		setResult(Activity.RESULT_OK);
 	}
@@ -65,18 +59,6 @@ public class PrefsActivity extends PreferenceActivity implements
 		mBackgroundColorPreference.setTitle("Background Color? (" + mPrefs.getBackgroundColor().getTitle(this) + ")");
 	}
 
-	private void setPeriodicFrequencyTitle() {
-		mPeriodicFrequencyPreference.setTitle("Frequency? (" + mPrefs.getPeriodicFrequency().getTitle(this) + ")");
-	}
-
-	private void setPeriodicState() {
-		if (mPrefs.isPeriodicSave()) {
-			mPeriodicFrequencyPreference.setEnabled(true);
-		} else {
-			mPeriodicFrequencyPreference.setEnabled(false);			
-		}		
-	}
-	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -86,9 +68,6 @@ public class PrefsActivity extends PreferenceActivity implements
 		setBufferTitle();
 		setTextsizeTitle();
 		setBackgroundColorTitle();
-		setPeriodicFrequencyTitle();
-		
-		setPeriodicState();
 		
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
@@ -113,20 +92,6 @@ public class PrefsActivity extends PreferenceActivity implements
 			setTextsizeTitle();
 		} else if (key.equals(Prefs.BACKGROUND_COLOR_KEY)) {
 			setBackgroundColorTitle();
-		} else if (key.equals(Prefs.PERIODIC_FREQUENCY_KEY)) {
-			setPeriodicFrequencyTitle();
-			
-			// restart with no frequency
-			mSaveScheduler.stop();
-			mSaveScheduler.start();
-		} else if (key.equals(Prefs.PERIODIC_SAVE_KEY)) {
-			setPeriodicState();
-		
-			if (mPrefs.isPeriodicSave()) {
-				mSaveScheduler.start();
-			} else {
-				mSaveScheduler.stop();
-			}
 		}
 	}
 }

@@ -62,9 +62,9 @@
 		<item>Black</item>
 	</string-array>
 	<string-array name="backgroundColor_values">
-		<item>#ffffff</item>
-		<item>#e0e0e0</item>
-		<item>#000000</item>
+		<item>WHITE</item>
+		<item>GRAY</item>
+		<item>BLACK</item>
 	</string-array>
 	<string-array name="periodicFrequency_values">
 		<item>FIFTEEN_MINUTES</item>

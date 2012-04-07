@@ -122,8 +122,8 @@ public class Logcat {
 	}
 
 	private void cat(ArrayList<String> cache) {
-		for (int i = 0; i < cache.size(); i++) {
-			cat(cache.get(i));
+		for (String s : cache) {
+			cat(s);
 		}
 		cache.clear();
 	}

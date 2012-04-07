@@ -8,13 +8,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
@@ -27,19 +28,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class LogActivity extends ListActivity {
-	private static class State {
-		List<LogEntry> entries = null;
-		boolean play = true;
-		int position = -1;
-	}
-
 	static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
 			"MMM d, yyyy HH:mm:ss ZZZZ");
+	private static final Executor EX = Executors.newCachedThreadPool();
 
 	static final int FILTER_DIALOG = 1;
 
@@ -71,10 +68,6 @@ public class LogActivity extends ListActivity {
 	private Prefs mPrefs;
 	private LogActivity mThis;
 	private boolean mPlay = true;
-	private boolean tailing = true;
-	private int scrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
-
-	private SaveScheduler mSaveScheduler;
 
 	private Handler mHandler = new Handler() {
 		@Override
@@ -91,38 +84,8 @@ public class LogActivity extends ListActivity {
 		}
 	};
 
-	private LogActivity.State getState() {
-		State state = new State();
-
-		state.entries = mLogEntryAdapter.getLogEntries();
-		state.play = mPlay;
-		int x = mLogList.getScrollX();
-		int y = mLogList.getScrollY();
-		state.position = mLogList.pointToPosition(x, y);
-
-		return state;
-	}
-
-	private void setState(final LogActivity.State state) {
-		if (state != null) {
-			if (!state.play) {
-				mLogEntryAdapter = new LogEntryAdapter(this, R.layout.entry,
-						state.entries);
-				setListAdapter(mLogEntryAdapter);
-				mPlay = false;
-			}
-			mLogList.post(new Runnable() {
-				public void run() {
-					synchronized (LogActivity.this) {
-						mLogList.setSelection(state.position);
-					}
-				}
-			});
-		}
-	}
-
 	private void jumpTop() {
-		tailing = false;
+		pauseLog();
 		mLogList.post(new Runnable() {
 			public void run() {
 				mLogList.setSelection(0);
@@ -131,7 +94,7 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void jumpBottom() {
-		tailing = true;
+		playLog();
 		mLogList.post(new Runnable() {
 			public void run() {
 				mLogList.setSelection(mLogEntryAdapter.getCount() - 1);
@@ -155,20 +118,17 @@ public class LogActivity extends ListActivity {
 		final LogEntry entry = new LogEntry(s, level);
 		mLogEntryAdapter.add(entry);
 
-		if (mPrefs.isAutoScroll() && tailing) {
-			jumpBottom();
-		}
+		jumpBottom();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.log);
-
+		getWindow().setTitle(getResources().getString(R.string.app_name));
+		
 		mThis = this;
 		mPrefs = new Prefs(this);
-
-		mSaveScheduler = new SaveScheduler(this);
 
 		mLogList = (ListView) findViewById(android.R.id.list);
 		mLogList.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
@@ -189,23 +149,17 @@ public class LogActivity extends ListActivity {
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				LogActivity.this.scrollState = scrollState;
+				if (scrollState == OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+					pauseLog();
+				}
 			}
 
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-					return;
-				}
-				if (firstVisibleItem + visibleItemCount == totalItemCount) {
-					tailing = true;
-				} else {
-					tailing = false;
-				}
 			}
 		});
-		
+
 		Log.v("alogcat", "created");
 	}
 
@@ -225,28 +179,18 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void init() {
-		mLogList.setBackgroundColor(mPrefs.getBackgroundColor().getColor());
-		mLogList.setCacheColorHint(mPrefs.getBackgroundColor().getColor());
-
-		final State state = (State) getLastNonConfigurationInstance();
-		if (state != null) {
-			setState(state);
-		} else {
-			mLogEntryAdapter = new LogEntryAdapter(this, R.layout.entry,
-					new ArrayList<LogEntry>());
-			setListAdapter(mLogEntryAdapter);
-			reset();
-		}
-
-		if (mPrefs.isPeriodicSave()) {
-			mSaveScheduler.start();
-		} else {
-			mSaveScheduler.stop();
-		}
-
+		BackgroundColor bc = mPrefs.getBackgroundColor();
+		int color = bc.getColor();
+		mLogList.setBackgroundColor(color);
+		mLogList.setCacheColorHint(color);
+		
+		mLogEntryAdapter = new LogEntryAdapter(this, R.layout.entry,
+				new ArrayList<LogEntry>());
+		setListAdapter(mLogEntryAdapter);
+		reset();
 		setKeepScreenOn();
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -259,15 +203,6 @@ public class LogActivity extends ListActivity {
 	public void onPause() {
 		super.onPause();
 		Log.v("alogcat", "paused");
-	}
-
-	@Override
-	public Object onRetainNonConfigurationInstance() {
-		if (mPlay) {
-			return null;
-		} else {
-			return getState();
-		}
 	}
 
 	@Override
@@ -303,12 +238,13 @@ public class LogActivity extends ListActivity {
 		}
 
 		mPlay = true;
-		new Thread(new Runnable() {
+
+		EX.execute(new Runnable() {
 			public void run() {
 				mLogcat = new Logcat(mThis, mHandler);
 				mLogcat.start();
 			}
-		}).start();
+		});
 	}
 
 	@Override
@@ -379,15 +315,9 @@ public class LogActivity extends ListActivity {
 			return true;
 		case MENU_PLAY:
 			if (mPlay) {
-				mLogcat.setPlay(false);
-				mPlay = false;
+				pauseLog();
 			} else {
-				if (mLogcat != null) {
-					mLogcat.setPlay(true);
-					mPlay = true;
-				} else {
-					reset();
-				}
+				playLog();
 			}
 			return true;
 		case MENU_CLEAR:
@@ -481,7 +411,7 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void share() {
-		new Thread(new Runnable() {
+		EX.execute(new Runnable() {
 			public void run() {
 				boolean html = mPrefs.isShareHtml();
 				String content = dump(html);
@@ -503,7 +433,7 @@ public class LogActivity extends ListActivity {
 				startActivity(Intent.createChooser(shareIntent,
 						"Share Android Log ..."));
 			}
-		}).start();
+		});
 
 	}
 
@@ -515,7 +445,7 @@ public class LogActivity extends ListActivity {
 		String msg = "saving log to: " + file.toString();
 		Log.d("alogcat", msg);
 
-		new Thread(new Runnable() {
+		EX.execute(new Runnable() {
 			public void run() {
 				String content = dump(false);
 
@@ -540,7 +470,7 @@ public class LogActivity extends ListActivity {
 					}
 				}
 			}
-		}).start();
+		});
 
 		return file;
 	}
@@ -554,4 +484,21 @@ public class LogActivity extends ListActivity {
 		return null;
 	}
 
+	private void pauseLog() {
+		getWindow().setTitle(getResources().getString(R.string.app_name_paused));
+		if (mLogcat != null) {
+			mLogcat.setPlay(false);
+			mPlay = false;
+		}
+	}
+
+	private void playLog() {
+		getWindow().setTitle(getResources().getString(R.string.app_name));		
+		if (mLogcat != null) {
+			mLogcat.setPlay(true);
+			mPlay = true;
+		} else {
+			reset();
+		}
+	}
 }

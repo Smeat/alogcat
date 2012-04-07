@@ -6,14 +6,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 public class LogSaver {
 	static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ssZ");
-
+	private static final Executor EX = Executors.newSingleThreadExecutor();
+	
 	private Context mContext;
 	private Prefs mPrefs;
 	private LogDumper mLogDumper;
@@ -26,14 +30,15 @@ public class LogSaver {
 	}
 
 	public File save() {
-		final File path = new File("/sdcard/alogcat");
+		final File path = new File(Environment.getExternalStorageDirectory(),
+				"alogcat");
 		final File file = new File(path + "/alogcat."
 				+ LOG_FILE_FORMAT.format(new Date()) + ".txt");
 
 		String msg = "saving log to: " + file.toString();
 		Log.d("alogcat", msg);
 
-		new Thread(new Runnable() {
+		EX.execute(new Runnable() {
 			public void run() {
 				String dump = mLogDumper.dump(false);
 
@@ -58,8 +63,8 @@ public class LogSaver {
 					}
 				}
 			}
-		}).start();
-		
+		});
+
 		return file;
 	}
 

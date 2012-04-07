@@ -8,10 +8,13 @@ public class Intent {
 	static final String SHARE_INTENT = "org.jtb.alogcat.intent.SHARE";
 	static final String SAVE_START_INTENT = "org.jtb.alogcat.intent.SAVE_START";
 	static final String SAVE_STOP_INTENT = "org.jtb.alogcat.intent.SAVE_STOP";
+	static final String RECORD_INTENT = "org.jtb.alogcat.intent.RECORD";
 	
 	static final String EXTRA_FILTER = "FILTER";
 	static final String EXTRA_LEVEL = "LEVEL";
 	static final String EXTRA_FREQUENCY = "FREQUENCY";
+	static final String EXTRA_START_RECORD = "START_WRITE";
+	static final String EXTRA_STOP_RECORD = "STOP_WRITE";
 	
 	static void handleExtras(Context context, android.content.Intent intent) {
 		Prefs prefs = new Prefs(context);
@@ -23,11 +26,6 @@ public class Intent {
 		if (l != null) {
 			Level level = Level.valueOf(l);
 			prefs.setLevel(level);
-		}
-		String f = intent.getStringExtra(EXTRA_FREQUENCY);
-		if (f != null) {
-			Frequency freq = Frequency.valueOf(f);
-			prefs.setPeriodicFrequency(freq);
 		}
 	}
 }

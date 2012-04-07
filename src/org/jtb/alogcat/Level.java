@@ -2,7 +2,7 @@ package org.jtb.alogcat;
 
 import android.content.Context;
 import android.graphics.Color;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public enum Level {
 	V(0, "#121212", R.string.verbose_title), D(1, "#00006C",

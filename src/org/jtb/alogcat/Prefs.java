@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class Prefs {
 	public static final String LEVEL_KEY = "level";
@@ -16,8 +16,6 @@ public class Prefs {
 	public static final String BUFFER_KEY = "buffer";
 	public static final String TEXTSIZE_KEY = "textsize";
 	public static final String BACKGROUND_COLOR_KEY = "backgroundColor";
-	public static final String PERIODIC_FREQUENCY_KEY = "periodicFrequency";
-	public static final String PERIODIC_SAVE_KEY = "periodicSave";
 	public static final String FILTER_PATTERN_KEY = "filterPattern";
 	public static final String SHARE_HTML_KEY = "shareHtml";
 	public static final String KEEP_SCREEN_ON_KEY = "keepScreenOn";
@@ -118,16 +116,9 @@ public class Prefs {
 		setString("filter", filter);
 	}
 
-	public boolean isAutoScroll() {
-		return getBoolean("autoScroll", true);
-	}
-
-	public void setAutoScroll(boolean autoScroll) {
-		setBoolean("autoScroll", autoScroll);
-	}
-
 	public BackgroundColor getBackgroundColor() {
 		String c = getString(BACKGROUND_COLOR_KEY, "WHITE");
+		Log.w("alogcat", "c=" + c);
 		BackgroundColor bc;
 
 		try {
@@ -135,6 +126,10 @@ public class Prefs {
 		} catch (IllegalArgumentException iae) {
 			bc = BackgroundColor.valueOfHexColor(c);
 		}
+		if (bc == null) {
+			return BackgroundColor.WHITE;
+		}
+		
 		return bc;
 	}
 
@@ -150,25 +145,6 @@ public class Prefs {
 
 	public void setKeepScreenOn(boolean keep) {
 		setBoolean(KEEP_SCREEN_ON_KEY, keep);
-	}
-
-	public boolean isPeriodicSave() {
-		boolean b = getBoolean(PERIODIC_SAVE_KEY, false);
-		return b;
-	}
-
-	public void setPeriodicSave(boolean save) {
-		setBoolean(PERIODIC_SAVE_KEY, save);
-	}
-	
-	public Frequency getPeriodicFrequency() {
-		String s = getString(PERIODIC_FREQUENCY_KEY, "HOUR");
-		Frequency f = Frequency.valueOf(s);
-		return f;
-	}
-
-	public void setPeriodicFrequency(Frequency f) {
-		setString(PERIODIC_FREQUENCY_KEY, f.toString());
 	}
 
 	public boolean isFilterPattern() {
