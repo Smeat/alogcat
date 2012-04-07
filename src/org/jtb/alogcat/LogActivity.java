@@ -165,7 +165,13 @@ public class LogActivity extends ListActivity {
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		Log.i("alogcat", "new intent: " + intent.getAction());
+		Log.i("alogcat", "new intent: " + intent);
+		if (intent == null) {
+			return;
+		}
+		if (intent.getAction() == null) {
+			return;
+		}
 		setIntent(intent);
 		if (intent.getAction().equals(org.jtb.alogcat.Intent.START_INTENT)) {
 			org.jtb.alogcat.Intent.handleExtras(this, intent);
