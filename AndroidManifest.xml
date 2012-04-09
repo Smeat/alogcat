@@ -3,6 +3,19 @@
     package="org.jtb.alogcat"
     android:versionCode="41"
     android:versionName="2.5.1" >
+    
+    
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="11" /> <!-- 11=>use ActionBar -->
+    
+    
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+ 
+    <!-- for GoogleTV -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
 
     <uses-sdk
         android:minSdkVersion="3"

@@ -257,9 +257,10 @@ public class LogActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-
+//TODO: maybe this should be in a menu.xml file. ;)
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
+		mPlayItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 		mFilterItem = menu.add(
 				0,
@@ -268,12 +269,14 @@ public class LogActivity extends ListActivity {
 				getResources().getString(R.string.filter_menu,
 						mPrefs.getFilter()));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
+		mFilterItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
 		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 
 		MenuItem shareItem = menu.add(0, MENU_SHARE, 0, R.string.share_menu);
 		shareItem.setIcon(android.R.drawable.ic_menu_share);
+		shareItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
