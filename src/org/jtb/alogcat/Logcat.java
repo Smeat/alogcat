@@ -18,7 +18,6 @@ public class Logcat {
 	private Pattern mFilterPattern = null;
 	private boolean mRunning = false;
 	private BufferedReader mReader = null;
-	private Format mFormat;
 	private boolean mIsFilterPattern;
 	private Handler mHandler;
 	private Buffer mBuffer;
@@ -27,6 +26,8 @@ public class Logcat {
 	private ArrayList<String> mLogCache = new ArrayList<String>();
 	private boolean mPlay = true;
 
+	Format mFormat;
+	
 	public Logcat(Context context, Handler handler) {
 		mContext = context;
 		mHandler = handler;
@@ -42,7 +43,7 @@ public class Logcat {
 	}
 
 	public void start() {
-		Log.d("alogcat", "starting ...");
+		//Log.d("alogcat", "starting ...");
 		mRunning = true;
 
 		try {
@@ -85,7 +86,7 @@ public class Logcat {
 			Log.e("alogcat", "error reading log", e);
 			return;
 		} finally {
-			Log.d("alogcat", "stopped");
+			//Log.d("alogcat", "stopped");
 
 			if (logcatProc != null) {
 				logcatProc.destroy();
@@ -129,7 +130,7 @@ public class Logcat {
 	}
 
 	public void stop() {
-		Log.d("alogcat", "stopping ...");
+		//Log.d("alogcat", "stopping ...");
 		mRunning = false;
 	}
 

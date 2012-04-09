@@ -4,23 +4,23 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<TextView android:layout_width="fill_parent" android:text="@string/filter_dialog_text"
 		android:layout_height="wrap_content" android:layout_weight="1"
-		android:layout_marginLeft="8px" android:layout_marginRight="8px"
+		android:layout_marginLeft="8dp" android:layout_marginRight="8dp"
 		android:autoLink="all"
-		android:layout_marginBottom="8px" android:layout_marginTop="8px">
+		android:layout_marginBottom="8dp" android:layout_marginTop="8dp">
 	</TextView>
 	<EditText android:id="@+id/filter_edit" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_weight="1"
-		android:layout_marginLeft="8px" android:layout_marginRight="8px"
-		android:layout_marginTop="8px" android:singleLine="true"
+		android:layout_marginLeft="8dp" android:layout_marginRight="8dp"
+		android:layout_marginTop="8dp" android:singleLine="true"
 		android:inputType="text" android:lines="1" />
 	<TextView android:layout_width="wrap_content" android:text="@string/pattern_error_text"
 		android:layout_height="wrap_content" android:layout_weight="1" android:visibility="gone"
-		android:textColor="#ff0000" android:layout_marginLeft="8px"
+		android:textColor="#ff0000" android:layout_marginLeft="8dp"
 		android:id="@+id/pattern_error_text"
-		android:layout_marginRight="8px" android:textStyle="bold"
-		android:layout_marginBottom="8px" android:layout_marginTop="8px">
+		android:layout_marginRight="8dp" android:textStyle="bold"
+		android:layout_marginBottom="8dp" android:layout_marginTop="8dp">
 	</TextView>
 	<CheckBox android:id="@+id/pattern_checkbox"
-		android:layout_marginTop="4px" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:text="Apply as regular expression?" />
+		android:layout_marginTop="4dp" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:text="@string/apply_as_regexp" />
 </LinearLayout>

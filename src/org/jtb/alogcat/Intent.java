@@ -6,9 +6,6 @@ public class Intent {
 	static final String START_INTENT = "org.jtb.alogcat.intent.START";
 	static final String SAVE_INTENT = "org.jtb.alogcat.intent.SAVE";
 	static final String SHARE_INTENT = "org.jtb.alogcat.intent.SHARE";
-	static final String SAVE_START_INTENT = "org.jtb.alogcat.intent.SAVE_START";
-	static final String SAVE_STOP_INTENT = "org.jtb.alogcat.intent.SAVE_STOP";
-	static final String RECORD_INTENT = "org.jtb.alogcat.intent.RECORD";
 	
 	static final String EXTRA_FILTER = "FILTER";
 	static final String EXTRA_LEVEL = "LEVEL";

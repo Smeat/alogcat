@@ -9,7 +9,7 @@ public class ShareReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("alogcat", "received intent for share");
+		//Log.d("alogcat", "received intent for share");
 
 		org.jtb.alogcat.Intent.handleExtras(context, intent);
 

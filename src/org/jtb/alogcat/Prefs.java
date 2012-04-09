@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public class Prefs {
 	public static final String LEVEL_KEY = "level";
@@ -118,7 +118,6 @@ public class Prefs {
 
 	public BackgroundColor getBackgroundColor() {
 		String c = getString(BACKGROUND_COLOR_KEY, "WHITE");
-		Log.w("alogcat", "c=" + c);
 		BackgroundColor bc;
 
 		try {

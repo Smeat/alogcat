@@ -36,7 +36,7 @@ public class LogSaver {
 				+ LOG_FILE_FORMAT.format(new Date()) + ".txt");
 
 		String msg = "saving log to: " + file.toString();
-		Log.d("alogcat", msg);
+		//Log.d("alogcat", msg);
 
 		EX.execute(new Runnable() {
 			public void run() {

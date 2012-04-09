@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.jtb.alogcat.donate"
-    android:versionCode="40"
-    android:versionName="2.5" >
+    package="org.jtb.alogcat"
+    android:versionCode="41"
+    android:versionName="2.5.1" >
 
     <uses-sdk
         android:minSdkVersion="3"
@@ -38,7 +38,6 @@
         <service android:name="org.jtb.alogcat.SaveService" />
         <service android:name="org.jtb.alogcat.ShareService" />
 
-        <receiver android:name="org.jtb.alogcat.WakeLockReceiver" />
         <receiver android:name="org.jtb.alogcat.SaveReceiver" >
             <intent-filter >
                 <action android:name="org.jtb.alogcat.intent.SAVE" />

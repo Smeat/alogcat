@@ -23,7 +23,7 @@ public class Lock {
 		WakeLock wakeLock = getLock(context);
 		if (!wakeLock.isHeld()) {
 			wakeLock.acquire();
-			Log.d("alogcat", "wake lock acquired");
+			//Log.d("alogcat", "wake lock acquired");
 		}
 	}
 
@@ -35,8 +35,7 @@ public class Lock {
 		} else {
 			if (lock.isHeld()) {
 				lock.release();
-				lock = null;
-				Log.d("alogcat", "wake lock released");
+				//Log.d("alogcat", "wake lock released");
 			} else {
 				Log.w("alogcat",
 						"release attempted, but wake lock was not held");

@@ -16,6 +16,7 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
@@ -31,7 +32,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public class LogActivity extends ListActivity {
 	static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
@@ -107,7 +108,7 @@ public class LogActivity extends ListActivity {
 			mLogEntryAdapter.remove(0);
 		}
 
-		Format format = mPrefs.getFormat();
+		Format format = mLogcat.mFormat;
 		Level level = format.getLevel(s);
 		if (level == null) {
 			level = mLastLevel;
@@ -126,7 +127,7 @@ public class LogActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.log);
 		getWindow().setTitle(getResources().getString(R.string.app_name));
-		
+
 		mThis = this;
 		mPrefs = new Prefs(this);
 
@@ -160,12 +161,12 @@ public class LogActivity extends ListActivity {
 			}
 		});
 
-		Log.v("alogcat", "created");
+		// Log.v("alogcat", "created");
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		Log.i("alogcat", "new intent: " + intent);
+		// Log.i("alogcat", "new intent: " + intent);
 		if (intent == null) {
 			return;
 		}
@@ -181,7 +182,7 @@ public class LogActivity extends ListActivity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		Log.v("alogcat", "started");
+		// Log.v("alogcat", "started");
 	}
 
 	private void init() {
@@ -189,7 +190,7 @@ public class LogActivity extends ListActivity {
 		int color = bc.getColor();
 		mLogList.setBackgroundColor(color);
 		mLogList.setCacheColorHint(color);
-		
+
 		mLogEntryAdapter = new LogEntryAdapter(this, R.layout.entry,
 				new ArrayList<LogEntry>());
 		setListAdapter(mLogEntryAdapter);
@@ -202,13 +203,13 @@ public class LogActivity extends ListActivity {
 		super.onResume();
 		onNewIntent(getIntent());
 		init();
-		Log.v("alogcat", "resumed");
+		// Log.v("alogcat", "resumed");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.v("alogcat", "paused");
+		// Log.v("alogcat", "paused");
 	}
 
 	@Override
@@ -222,17 +223,17 @@ public class LogActivity extends ListActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.v("alogcat", "destroyed");
+		// Log.v("alogcat", "destroyed");
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle b) {
-		Log.v("alogcat", "save instance");
+		// Log.v("alogcat", "save instance");
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle b) {
-		Log.v("alogcat", "restore instance");
+		// Log.v("alogcat", "restore instance");
 	}
 
 	public void reset() {
@@ -444,12 +445,13 @@ public class LogActivity extends ListActivity {
 	}
 
 	private File save() {
-		final File path = new File("/sdcard/alogcat");
-		final File file = new File(path + "/alogcat."
+		final File path = new File(Environment.getExternalStorageDirectory(),
+				"alogcat");
+		final File file = new File(path + File.separator + "alogcat."
 				+ LogSaver.LOG_FILE_FORMAT.format(new Date()) + ".txt");
 
-		String msg = "saving log to: " + file.toString();
-		Log.d("alogcat", msg);
+		//String msg = "saving log to: " + file.toString();
+		// Log.d("alogcat", msg);
 
 		EX.execute(new Runnable() {
 			public void run() {
@@ -491,7 +493,8 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void pauseLog() {
-		getWindow().setTitle(getResources().getString(R.string.app_name_paused));
+		getWindow()
+				.setTitle(getResources().getString(R.string.app_name_paused));
 		if (mLogcat != null) {
 			mLogcat.setPlay(false);
 			mPlay = false;
@@ -499,7 +502,7 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void playLog() {
-		getWindow().setTitle(getResources().getString(R.string.app_name));		
+		getWindow().setTitle(getResources().getString(R.string.app_name));
 		if (mLogcat != null) {
 			mLogcat.setPlay(true);
 			mPlay = true;

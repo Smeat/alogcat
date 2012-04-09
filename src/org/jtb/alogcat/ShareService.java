@@ -14,7 +14,7 @@ public class ShareService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.d("alogcat", "handling intent: " + intent.getAction());
+		//Log.d("alogcat", "handling intent: " + intent.getAction());
 
 		Prefs prefs = new Prefs(this);
 

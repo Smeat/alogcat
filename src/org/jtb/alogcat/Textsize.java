@@ -1,9 +1,9 @@
 package org.jtb.alogcat;
 
-import java.util.HashMap;
+import org.jtb.alogcat.R;
 
 import android.content.Context;
-import org.jtb.alogcat.donate.R;
+import android.util.SparseArray;
 
 public enum Textsize {
 	SMALL(8, R.string.small_title),
@@ -18,7 +18,7 @@ public enum Textsize {
 		byOrder[2] = LARGE;
 	}
 	
-	private static final HashMap<Integer,Textsize> VALUE_MAP = new HashMap<Integer,Textsize>();
+	private static final SparseArray<Textsize> VALUE_MAP = new SparseArray<Textsize>();
 	
 	static {
 		VALUE_MAP.put(SMALL.mValue, SMALL); 
@@ -37,10 +37,6 @@ public enum Textsize {
 	public String getTitle(Context context) {
 		return context.getResources().getString(mTitleId);
 	}	
-	
-	public static final Textsize byValue(String value) {
-		return VALUE_MAP.get(value);
-	}
 	
 	public static Textsize getByOrder(int order) {
 		return byOrder[order];

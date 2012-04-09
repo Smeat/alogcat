@@ -9,7 +9,7 @@ public class SaveReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("alogcat", "received intent for save");
+		//Log.d("alogcat", "received intent for save");
 
 		org.jtb.alogcat.Intent.handleExtras(context, intent);
 
