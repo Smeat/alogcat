@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">aLogcat</string>
-    <string name="app_name_paused">aLogcat - output paused</string>
+    <string name="app_name_paused">aLogcat (paused)</string>
     <string name="app_prefs">aLogcat - Preferences</string>
     <string name="cancel">Cancel</string>
     <string name="ok">Okay</string>

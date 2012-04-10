@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -257,10 +259,11 @@ public class LogActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-//TODO: maybe this should be in a menu.xml file. ;)
+		// TODO: maybe this should be in a menu.xml file. ;)
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
-		mPlayItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(mPlayItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		mFilterItem = menu.add(
 				0,
@@ -269,27 +272,37 @@ public class LogActivity extends ListActivity {
 				getResources().getString(R.string.filter_menu,
 						mPrefs.getFilter()));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
-		mFilterItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(mFilterItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
 		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		MenuItemCompat.setShowAsAction(clearItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem shareItem = menu.add(0, MENU_SHARE, 0, R.string.share_menu);
 		shareItem.setIcon(android.R.drawable.ic_menu_share);
-		shareItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(shareItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
+		MenuItemCompat.setShowAsAction(saveItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem prefsItem = menu.add(0, MENU_PREFS, 0, getResources()
 				.getString(R.string.prefs_menu));
 		prefsItem.setIcon(android.R.drawable.ic_menu_preferences);
+		MenuItemCompat.setShowAsAction(prefsItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		return true;
 	}
 
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
+	public void setPlayMenu() {
+		if (mPlayItem == null) {
+			return;
+		}
 		if (mPlay) {
 			mPlayItem.setTitle(R.string.pause_menu);
 			mPlayItem.setIcon(android.R.drawable.ic_media_pause);
@@ -297,15 +310,26 @@ public class LogActivity extends ListActivity {
 			mPlayItem.setTitle(R.string.play_menu);
 			mPlayItem.setIcon(android.R.drawable.ic_media_play);
 		}
+	}
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		setPlayMenu();
+		setFilterMenu();
+
+		return true;
+	}
+
+	private void setFilterMenu() {
+		if (mFilterItem == null) {
+			return;
+		}
 		int filterMenuId = R.string.filter_menu;
 		String filter = mPrefs.getFilter();
 		if (filter == null || filter.length() == 0) {
 			filterMenuId = R.string.filter_menu_empty;
 		}
 		mFilterItem.setTitle(getResources().getString(filterMenuId, filter));
-
-		return true;
 	}
 
 	@Override
@@ -327,7 +351,7 @@ public class LogActivity extends ListActivity {
 			if (mPlay) {
 				pauseLog();
 			} else {
-				playLog();
+				jumpBottom();
 			}
 			return true;
 		case MENU_CLEAR:
@@ -453,7 +477,7 @@ public class LogActivity extends ListActivity {
 		final File file = new File(path + File.separator + "alogcat."
 				+ LogSaver.LOG_FILE_FORMAT.format(new Date()) + ".txt");
 
-		//String msg = "saving log to: " + file.toString();
+		// String msg = "saving log to: " + file.toString();
 		// Log.d("alogcat", msg);
 
 		EX.execute(new Runnable() {
@@ -502,6 +526,7 @@ public class LogActivity extends ListActivity {
 			mLogcat.setPlay(false);
 			mPlay = false;
 		}
+		setPlayMenu();
 	}
 
 	private void playLog() {
@@ -512,5 +537,6 @@ public class LogActivity extends ListActivity {
 		} else {
 			reset();
 		}
+		setPlayMenu();
 	}
 }
