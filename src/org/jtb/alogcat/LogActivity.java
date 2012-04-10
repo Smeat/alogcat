@@ -272,13 +272,15 @@ public class LogActivity extends ListActivity {
 				getResources().getString(R.string.filter_menu,
 						mPrefs.getFilter()));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
+		// if possible, show this with text. (usually happens only on landscape)
 		MenuItemCompat.setShowAsAction(mFilterItem,
-				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
 
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
 		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		MenuItemCompat.setShowAsAction(clearItem,
-				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		// only have the most important actions as actions. If any at all.
+		//MenuItemCompat.setShowAsAction(clearItem,
+		//		MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem shareItem = menu.add(0, MENU_SHARE, 0, R.string.share_menu);
 		shareItem.setIcon(android.R.drawable.ic_menu_share);
@@ -287,14 +289,16 @@ public class LogActivity extends ListActivity {
 
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
-		MenuItemCompat.setShowAsAction(saveItem,
-				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		// only have the most important actions as actions. If any at all.
+		//MenuItemCompat.setShowAsAction(saveItem,
+		//		MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem prefsItem = menu.add(0, MENU_PREFS, 0, getResources()
 				.getString(R.string.prefs_menu));
 		prefsItem.setIcon(android.R.drawable.ic_menu_preferences);
-		MenuItemCompat.setShowAsAction(prefsItem,
-				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		// only have the most important actions as actions. If any at all.
+		//MenuItemCompat.setShowAsAction(prefsItem,
+		//		MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		return true;
 	}
@@ -538,5 +542,9 @@ public class LogActivity extends ListActivity {
 			reset();
 		}
 		setPlayMenu();
+	}
+
+	public void filterChanged(String aFilterString) {
+		setFilterMenu();
 	}
 }
