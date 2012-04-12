@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class Prefs {
 	public static final String LEVEL_KEY = "level";

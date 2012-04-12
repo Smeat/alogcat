@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.jtb.alogcat"
+    package="org.jtb.alogcat.donate"
     android:versionCode="42"
     android:versionName="2.6" >
 

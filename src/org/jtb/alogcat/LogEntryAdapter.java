@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class LogEntryAdapter extends ArrayAdapter<LogEntry> {
 	private Activity mActivity;

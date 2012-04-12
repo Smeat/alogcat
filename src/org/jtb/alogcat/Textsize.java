@@ -1,6 +1,6 @@
 package org.jtb.alogcat;
 
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 import android.content.Context;
 import android.util.SparseArray;

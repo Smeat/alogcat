@@ -3,7 +3,7 @@ package org.jtb.alogcat;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -82,6 +82,7 @@ public class FilterDialog extends AlertDialog {
 						mPrefs.setFilter(filterEdit.getText().toString());
 						mPrefs.setFilterPattern(patternCheckBox.isChecked());
 
+						mLogActivity.setFilterMenu();
 						mLogActivity.dismissDialog(LogActivity.FILTER_DIALOG);
 						mLogActivity.reset();
 					}
@@ -98,6 +99,8 @@ public class FilterDialog extends AlertDialog {
 						patternCheckBox.setChecked(false);						
 
 						fd.mError = false;
+
+						mLogActivity.setFilterMenu();
 						mLogActivity.dismissDialog(LogActivity.FILTER_DIALOG);
 						mLogActivity.reset();
 					}

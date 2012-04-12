@@ -34,7 +34,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import org.jtb.alogcat.R;
+import org.jtb.alogcat.donate.R;
 
 public class LogActivity extends ListActivity {
 	static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
@@ -259,6 +259,7 @@ public class LogActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
+
 		// TODO: maybe this should be in a menu.xml file. ;)
 		mPlayItem = menu.add(0, MENU_PLAY, 0, R.string.pause_menu);
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
@@ -272,15 +273,15 @@ public class LogActivity extends ListActivity {
 				getResources().getString(R.string.filter_menu,
 						mPrefs.getFilter()));
 		mFilterItem.setIcon(android.R.drawable.ic_menu_search);
-		// if possible, show this with text. (usually happens only on landscape)
 		MenuItemCompat.setShowAsAction(mFilterItem,
-				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
-
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
+						| MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
+		setFilterMenu();
+		
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
 		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		// only have the most important actions as actions. If any at all.
-		//MenuItemCompat.setShowAsAction(clearItem,
-		//		MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(clearItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem shareItem = menu.add(0, MENU_SHARE, 0, R.string.share_menu);
 		shareItem.setIcon(android.R.drawable.ic_menu_share);
@@ -289,17 +290,20 @@ public class LogActivity extends ListActivity {
 
 		MenuItem saveItem = menu.add(0, MENU_SAVE, 0, R.string.save_menu);
 		saveItem.setIcon(android.R.drawable.ic_menu_save);
-		// only have the most important actions as actions. If any at all.
-		//MenuItemCompat.setShowAsAction(saveItem,
-		//		MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(saveItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem prefsItem = menu.add(0, MENU_PREFS, 0, getResources()
 				.getString(R.string.prefs_menu));
 		prefsItem.setIcon(android.R.drawable.ic_menu_preferences);
-		// only have the most important actions as actions. If any at all.
-		//MenuItemCompat.setShowAsAction(prefsItem,
-		//		MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		MenuItemCompat.setShowAsAction(prefsItem,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
+		return true;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
 		return true;
 	}
 
@@ -316,22 +320,16 @@ public class LogActivity extends ListActivity {
 		}
 	}
 
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		setPlayMenu();
-		setFilterMenu();
-
-		return true;
-	}
-
-	private void setFilterMenu() {
+	void setFilterMenu() {
 		if (mFilterItem == null) {
 			return;
 		}
-		int filterMenuId = R.string.filter_menu;
+		int filterMenuId;
 		String filter = mPrefs.getFilter();
 		if (filter == null || filter.length() == 0) {
 			filterMenuId = R.string.filter_menu_empty;
+		} else {
+			filterMenuId = R.string.filter_menu;			
 		}
 		mFilterItem.setTitle(getResources().getString(filterMenuId, filter));
 	}
@@ -542,9 +540,5 @@ public class LogActivity extends ListActivity {
 			reset();
 		}
 		setPlayMenu();
-	}
-
-	public void filterChanged(String aFilterString) {
-		setFilterMenu();
 	}
 }
