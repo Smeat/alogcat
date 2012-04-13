@@ -1,5 +1,6 @@
 package org.jtb.alogcat;
 
+import java.util.Collections;
 import java.util.List;
 
 import android.app.Activity;
@@ -9,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public class LogEntryAdapter extends ArrayAdapter<LogEntry> {
 	private Activity mActivity;
@@ -56,7 +57,12 @@ public class LogEntryAdapter extends ArrayAdapter<LogEntry> {
 		return false;
 	}
 
-	public List<LogEntry> getLogEntries() {
-		return entries;
+	public LogEntry get(int position) {
+		return entries.get(position);
+	}
+	
+	public List<LogEntry> getEntries() {
+		return Collections.unmodifiableList(entries);
 	}
 }
+

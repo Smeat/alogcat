@@ -3,7 +3,7 @@ package org.jtb.alogcat;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

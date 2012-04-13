@@ -4,7 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import android.content.Context;
@@ -13,6 +18,8 @@ import android.os.Message;
 import android.util.Log;
 
 public class Logcat {
+	private static final long CAT_DELAY = 1;
+
 	private Level mLevel = null;
 	private String mFilter = null;
 	private Pattern mFilterPattern = null;
@@ -25,9 +32,26 @@ public class Logcat {
 	private Context mContext;
 	private ArrayList<String> mLogCache = new ArrayList<String>();
 	private boolean mPlay = true;
+	private long lastCat = -1;
+	private Runnable catRunner = new Runnable() {
+
+		@Override
+		public void run() {
+			if (!mPlay) {
+				return;
+			}
+			long now = System.currentTimeMillis();
+			if (now < lastCat + CAT_DELAY) {
+				return;
+			}
+			lastCat = now;
+			cat();
+		}
+	};
+	private ScheduledExecutorService EX;
 
 	Format mFormat;
-	
+
 	public Logcat(Context context, Handler handler) {
 		mContext = context;
 		mHandler = handler;
@@ -43,8 +67,14 @@ public class Logcat {
 	}
 
 	public void start() {
-		//Log.d("alogcat", "starting ...");
+		// Log.d("alogcat", "starting ...");
+		stop();
+
 		mRunning = true;
+
+		EX = Executors.newScheduledThreadPool(1);
+		EX.scheduleAtFixedRate(catRunner, CAT_DELAY, CAT_DELAY,
+				TimeUnit.SECONDS);
 
 		try {
 			Message m = Message.obtain(mHandler, LogActivity.CLEAR_WHAT);
@@ -75,10 +105,19 @@ public class Logcat {
 				if (line.length() == 0) {
 					continue;
 				}
-				if (mPlay) {
-					cat(mLogCache);
-					cat(line);
+				if (mIsFilterPattern) {
+					if (mFilterPattern != null
+							&& !mFilterPattern.matcher(line).find()) {
+						continue;
+					}
 				} else {
+					if (mFilter != null
+							&& !line.toLowerCase().contains(
+									mFilter.toLowerCase())) {
+						continue;
+					}
+				}
+				synchronized (mLogCache) {
 					mLogCache.add(line);
 				}
 			}
@@ -86,7 +125,7 @@ public class Logcat {
 			Log.e("alogcat", "error reading log", e);
 			return;
 		} finally {
-			//Log.d("alogcat", "stopped");
+			// Log.d("alogcat", "stopped");
 
 			if (logcatProc != null) {
 				logcatProc.destroy();
@@ -103,35 +142,29 @@ public class Logcat {
 		}
 	}
 
-	private void cat(String line) {
-		if (mIsFilterPattern) {
-			if (mFilterPattern != null && !mFilterPattern.matcher(line).find()) {
-				return;
-			}
-		} else {
-			if (mFilter != null
-					&& !line.toLowerCase().contains(mFilter.toLowerCase())) {
-				return;
-			}
-		}
-
+	private void cat() {
 		Message m;
 
-		m = Message.obtain(mHandler, LogActivity.CAT_WHAT);
-		m.obj = line;
-		mHandler.sendMessage(m);
-	}
-
-	private void cat(ArrayList<String> cache) {
-		for (String s : cache) {
-			cat(s);
+		if (mLogCache.size() > 0) {
+			synchronized (mLogCache) {
+				if (mLogCache.size() > 0) {
+					m = Message.obtain(mHandler, LogActivity.CAT_WHAT);
+					m.obj = mLogCache.clone();
+					mLogCache.clear();
+					mHandler.sendMessage(m);					
+				}
+			}
 		}
-		cache.clear();
 	}
 
 	public void stop() {
-		//Log.d("alogcat", "stopping ...");
+		// Log.d("alogcat", "stopping ...");
 		mRunning = false;
+
+		if (EX != null && !EX.isShutdown()) {
+			EX.shutdown();
+			EX = null;
+		}
 	}
 
 	public boolean isRunning() {

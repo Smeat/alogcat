@@ -16,10 +16,10 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.view.MenuCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.text.Html;
 import android.text.TextUtils;
@@ -34,7 +34,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import org.jtb.alogcat.donate.R;
+import org.jtb.alogcat.R;
 
 public class LogActivity extends ListActivity {
 	static final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat(
@@ -54,7 +54,7 @@ public class LogActivity extends ListActivity {
 	private static final int MENU_JUMP_TOP = 11;
 	private static final int MENU_JUMP_BOTTOM = 12;
 
-	private static final int WINDOW_SIZE = 1000;
+	static final int WINDOW_SIZE = 1000;
 
 	static final int CAT_WHAT = 0;
 	static final int CLEAR_WHAT = 2;
@@ -77,8 +77,8 @@ public class LogActivity extends ListActivity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case CAT_WHAT:
-				final String line = (String) msg.obj;
-				cat(line);
+				final List<String> lines = (List<String>) msg.obj;
+				cat(lines);
 				break;
 			case CLEAR_WHAT:
 				mLogEntryAdapter.clear();
@@ -98,11 +98,7 @@ public class LogActivity extends ListActivity {
 
 	private void jumpBottom() {
 		playLog();
-		mLogList.post(new Runnable() {
-			public void run() {
-				mLogList.setSelection(mLogEntryAdapter.getCount() - 1);
-			}
-		});
+		mLogList.setSelection(mLogEntryAdapter.getCount() - 1);
 	}
 
 	private void cat(final String s) {
@@ -120,7 +116,12 @@ public class LogActivity extends ListActivity {
 
 		final LogEntry entry = new LogEntry(s, level);
 		mLogEntryAdapter.add(entry);
+	}
 
+	private void cat(List<String> lines) {
+		for (String line : lines) {
+			cat(line);
+		}
 		jumpBottom();
 	}
 
@@ -152,9 +153,7 @@ public class LogActivity extends ListActivity {
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				if (scrollState == OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-					pauseLog();
-				}
+				pauseLog();
 			}
 
 			@Override
@@ -194,7 +193,7 @@ public class LogActivity extends ListActivity {
 		mLogList.setCacheColorHint(color);
 
 		mLogEntryAdapter = new LogEntryAdapter(this, R.layout.entry,
-				new ArrayList<LogEntry>());
+				new ArrayList<LogEntry>(WINDOW_SIZE));
 		setListAdapter(mLogEntryAdapter);
 		reset();
 		setKeepScreenOn();
@@ -202,6 +201,7 @@ public class LogActivity extends ListActivity {
 
 	@Override
 	public void onResume() {
+		//Debug.startMethodTracing("alogcat");
 		super.onResume();
 		onNewIntent(getIntent());
 		init();
@@ -212,6 +212,8 @@ public class LogActivity extends ListActivity {
 	public void onPause() {
 		super.onPause();
 		// Log.v("alogcat", "paused");
+
+		//Debug.stopMethodTracing();
 	}
 
 	@Override
@@ -239,7 +241,7 @@ public class LogActivity extends ListActivity {
 	}
 
 	public void reset() {
-		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_LONG).show();
+		Toast.makeText(this, R.string.reading_logs, Toast.LENGTH_SHORT).show();
 		mLastLevel = Level.V;
 
 		if (mLogcat != null) {
@@ -265,6 +267,7 @@ public class LogActivity extends ListActivity {
 		mPlayItem.setIcon(android.R.drawable.ic_media_pause);
 		MenuItemCompat.setShowAsAction(mPlayItem,
 				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		setPlayMenu();
 
 		mFilterItem = menu.add(
 				0,
@@ -277,7 +280,7 @@ public class LogActivity extends ListActivity {
 				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM
 						| MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
 		setFilterMenu();
-		
+
 		MenuItem clearItem = menu.add(0, MENU_CLEAR, 0, R.string.clear_menu);
 		clearItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		MenuItemCompat.setShowAsAction(clearItem,
@@ -329,7 +332,7 @@ public class LogActivity extends ListActivity {
 		if (filter == null || filter.length() == 0) {
 			filterMenuId = R.string.filter_menu_empty;
 		} else {
-			filterMenuId = R.string.filter_menu;			
+			filterMenuId = R.string.filter_menu;
 		}
 		mFilterItem.setTitle(getResources().getString(filterMenuId, filter));
 	}
@@ -422,7 +425,7 @@ public class LogActivity extends ListActivity {
 
 		// make copy to avoid CME
 		List<LogEntry> entries = new ArrayList<LogEntry>(
-				mLogEntryAdapter.getLogEntries());
+				mLogEntryAdapter.getEntries());
 
 		for (LogEntry le : entries) {
 			if (!html) {
@@ -522,6 +525,9 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void pauseLog() {
+		if (!mPlay) {
+			return;
+		}
 		getWindow()
 				.setTitle(getResources().getString(R.string.app_name_paused));
 		if (mLogcat != null) {
@@ -532,6 +538,9 @@ public class LogActivity extends ListActivity {
 	}
 
 	private void playLog() {
+		if (mPlay) {
+			return;
+		}
 		getWindow().setTitle(getResources().getString(R.string.app_name));
 		if (mLogcat != null) {
 			mLogcat.setPlay(true);
