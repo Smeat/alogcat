@@ -33,6 +33,7 @@ public class Logcat {
 	private ArrayList<String> mLogCache = new ArrayList<String>();
 	private boolean mPlay = true;
 	private long lastCat = -1;
+	private boolean mAsRoot = false;
 	private Runnable catRunner = new Runnable() {
 
 		@Override
@@ -64,6 +65,8 @@ public class Logcat {
 		mFilterPattern = prefs.getFilterPattern();
 		mFormat = prefs.getFormat();
 		mBuffer = prefs.getBuffer();
+		
+		mAsRoot = prefs.isRootOn();
 	}
 
 	public void start() {
@@ -82,6 +85,10 @@ public class Logcat {
 
 			List<String> progs = new ArrayList<String>();
 
+			if(mAsRoot){
+				progs.add("su");
+				progs.add("-c");
+			}
 			progs.add("logcat");
 			progs.add("-v");
 			progs.add(mFormat.getValue());

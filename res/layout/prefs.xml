@@ -58,4 +58,12 @@
             android:summary="Share logs in HTML format?"
             android:title="HTML?" />
     </PreferenceCategory>
+    
+    <PreferenceCategory android:title="Advanced" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="runAsRoot"
+            android:summary="Run as Root?"
+            android:title="Root?" />        
+    </PreferenceCategory>
 </PreferenceScreen>

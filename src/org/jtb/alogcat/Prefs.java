@@ -19,6 +19,7 @@ public class Prefs {
 	public static final String FILTER_PATTERN_KEY = "filterPattern";
 	public static final String SHARE_HTML_KEY = "shareHtml";
 	public static final String KEEP_SCREEN_ON_KEY = "keepScreenOn";
+	public static final String RUN_AS_ROOT_KEY = "runAsRoot";
 
 	private SharedPreferences sharedPrefs = null;
 
@@ -152,5 +153,9 @@ public class Prefs {
 
 	public void setFilterPattern(boolean filterPattern) {
 		setBoolean(FILTER_PATTERN_KEY, filterPattern);
+	}
+	
+	public boolean isRootOn() {
+		return getBoolean(RUN_AS_ROOT_KEY, false);
 	}
 }
